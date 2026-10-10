@@ -33,6 +33,8 @@ model User {
   locale       String      @default("en")
   active       Boolean     @default(true)
   outOfOffice  Boolean     @default(false) @map("out_of_office")
+  emailEnabled Boolean     @default(true) @map("email_enabled")
+  mustChangePassword Boolean @default(false) @map("must_change_password")
   departmentId String?     @map("department_id") @db.Uuid
   department   Department? @relation(fields: [departmentId], references: [id])
   roles        UserRole[]
@@ -317,9 +319,12 @@ model Notification {
   channel     String    @default("IN_APP") // IN_APP | EMAIL | WHATSAPP
   readAt      DateTime? @map("read_at")
   sentAt      DateTime? @map("sent_at")
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
   createdAt   DateTime  @default(now()) @map("created_at")
 
   @@index([userId, readAt])
+  @@index([channel, sentAt])
   @@map("notifications")
 }
 

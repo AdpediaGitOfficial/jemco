@@ -36,6 +36,14 @@ Uploads go through the API (`POST /v1/attachments`, 25 MB, images/PDF/DWG/DXF) a
 
 `GET /v1/reports/management?months=12` feeds the dashboard (department managers see their department only); `GET /v1/reports/register.csv` exports every NCR. Both are SQL so the screen and the export share one definition.
 
+## Email
+
+Every notification is queued twice: `IN_APP` (shown in the app) and `EMAIL`. A job drains the email queue every minute through SMTP when `SMTP_HOST` is set (Resend, SES, Google Workspace and MailHog all speak SMTP); without it, emails are logged and marked sent so dev and CI need no mail server. Emails are rendered in the recipient's language (`en`/`ms`); users can switch email off in **Account**. A Monday 08:00 digest lists each person's open items. Failed sends retry up to 5 times and keep the last error on the row.
+
+## Admin (QA manager)
+
+`/admin` covers choice lists (relabel, add, hide — workflow-critical codes cannot be hidden), routing (department, person in charge and backup per process; when the PIC is marked away, triage assigns the backup automatically), the SLA table, holidays, people (create with a temporary password that must be changed at first sign-in, roles, department, away/email flags, deactivate, reset password) and a change-history view. Every setting change is written to `change_log` by trigger with the manager's name.
+
 ## Checks
 
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` — the same four CI runs.

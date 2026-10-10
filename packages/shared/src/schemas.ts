@@ -107,3 +107,58 @@ export const VerifySchema = z.discriminatedUnion("result", [
 export type VerifyInput = z.infer<typeof VerifySchema>;
 
 export const ReopenSchema = z.object({ reason: z.string().trim().min(1).max(1000) });
+
+/** Admin: lookup options, routing, SLA, calendar, users. QA manager only. */
+export const LookupOptionSchema = z.object({
+  code: z.string().trim().regex(/^[A-Z0-9_]{2,40}$/, "code"),
+  labelEn: z.string().trim().min(1).max(120),
+  labelMs: z.string().trim().min(1).max(120),
+  helpEn: z.string().trim().max(200).optional().nullable(),
+  helpMs: z.string().trim().max(200).optional().nullable(),
+  active: z.boolean().default(true),
+  sortOrder: z.number().int().min(0).max(999).optional(),
+});
+export const LookupOptionPatchSchema = LookupOptionSchema.omit({ code: true }).partial();
+
+export const RoutingSchema = z.object({
+  departmentId: z.string().uuid(),
+  primaryPicId: z.string().uuid().nullable().optional(),
+  backupPicId: z.string().uuid().nullable().optional(),
+});
+
+export const SlaPolicySchema = z.object({
+  triageDays: z.number().int().min(0).max(60),
+  responseDays: z.number().int().min(0).max(60),
+  resolutionDays: z.number().int().min(1).max(365),
+  verificationDays: z.number().int().min(0).max(60),
+});
+
+export const HolidaySchema = z.object({ date: z.iso.date(), reason: z.string().trim().min(1).max(80) });
+
+const RoleEnum = z.enum(["ISSUER", "PIC", "DEPT_MANAGER", "QA_COORDINATOR", "QA_MANAGER", "AUDITOR"]);
+export const CreateUserSchema = z.object({
+  email: z.email().transform((e) => e.toLowerCase()),
+  name: z.string().trim().min(1).max(80),
+  departmentId: z.string().uuid().nullable().optional(),
+  roles: z.array(RoleEnum).min(1),
+  locale: z.enum(["en", "ms"]).default("en"),
+});
+export const PatchUserSchema = z.object({
+  name: z.string().trim().min(1).max(80).optional(),
+  departmentId: z.string().uuid().nullable().optional(),
+  roles: z.array(RoleEnum).min(1).optional(),
+  active: z.boolean().optional(),
+  outOfOffice: z.boolean().optional(),
+  emailEnabled: z.boolean().optional(),
+  locale: z.enum(["en", "ms"]).optional(),
+});
+
+export const ChangePasswordSchema = z.object({
+  current: z.string().min(1),
+  next: z.string().min(12, "min12").max(200),
+});
+export const MyPrefsSchema = z.object({
+  locale: z.enum(["en", "ms"]).optional(),
+  emailEnabled: z.boolean().optional(),
+  outOfOffice: z.boolean().optional(),
+});

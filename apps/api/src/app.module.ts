@@ -15,9 +15,11 @@ import { NotificationsModule } from "./notifications/notifications.module";
 import { WorkflowModule } from "./workflow/workflow.module";
 import { AttachmentsModule } from "./attachments/attachments.module";
 import { ReportsModule } from "./reports/reports.module";
+import { MailModule } from "./mail/mail.module";
+import { AdminModule } from "./admin/admin.module";
 
 @Module({
-  imports: [ScheduleModule.forRoot(), PrismaModule, AuthModule, NotificationsModule, WorkflowModule, ComplaintsModule, NcrModule, AttachmentsModule, ReportsModule],
+  imports: [ScheduleModule.forRoot(), PrismaModule, AuthModule, NotificationsModule, WorkflowModule, ComplaintsModule, NcrModule, AttachmentsModule, ReportsModule, MailModule, AdminModule],
   controllers: [HealthController, UsersController, LookupsController, TodoController],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

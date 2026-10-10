@@ -1,6 +1,7 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Patch, Post, Req, Res } from "@nestjs/common";
 import type { Request, Response } from "express";
-import { LoginSchema, type LoginInput } from "@jemco/shared";
+import { ChangePasswordSchema, LoginSchema, MyPrefsSchema, type LoginInput } from "@jemco/shared";
+import type { z } from "zod";
 import { AuthService } from "./auth.service";
 import { CurrentUser, Public, type AuthUser } from "../common/decorators";
 import { ZodPipe } from "../common/zod.pipe";
@@ -33,4 +34,16 @@ export class AuthController {
 
   @Get("me")
   me(@CurrentUser() user: AuthUser) { return user; }
+
+  @Post("change-password")
+  @HttpCode(204)
+  async changePassword(@CurrentUser() user: AuthUser, @Body(new ZodPipe(ChangePasswordSchema)) b: z.infer<typeof ChangePasswordSchema>) {
+    await this.auth.changePassword(user.id, b.current, b.next);
+  }
+
+  @Patch("me")
+  async prefs(@CurrentUser() user: AuthUser, @Body(new ZodPipe(MyPrefsSchema)) b: z.infer<typeof MyPrefsSchema>) {
+    await this.auth.updatePrefs(user.id, b);
+    return { ...user, ...b };
+  }
 }

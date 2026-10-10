@@ -14,6 +14,9 @@ export interface AuthUser {
   locale: string;
   departmentId: string | null;
   roles: string[];
+  emailEnabled: boolean;
+  outOfOffice: boolean;
+  mustChangePassword: boolean;
 }
 
 export const CurrentUser = createParamDecorator((_: unknown, ctx: ExecutionContext): AuthUser => {

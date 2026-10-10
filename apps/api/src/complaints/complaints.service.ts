@@ -80,13 +80,20 @@ export class ComplaintsService {
         return { status: "NEED_MORE_INFO" };
       }
       // ACCEPT
+      // Away? Use the routing backup for that process when one exists.
+      let assigneeId = d.assigneeId;
+      const chosen = await tx.user.findUnique({ where: { id: assigneeId }, select: { outOfOffice: true } });
+      if (chosen?.outOfOffice) {
+        const route = await tx.routingMap.findUnique({ where: { process: c.process }, include: { backupPic: { select: { id: true, outOfOffice: true, active: true } } } });
+        if (route?.backupPic && route.backupPic.active && !route.backupPic.outOfOffice) assigneeId = route.backupPic.id;
+      }
       const [{ n }] = await tx.$queryRaw<{ n: string }[]>`SELECT next_number('NCR') AS n`;
       const resolutionDays = await this.sla.daysFor(tx, d.priority, "RESOLUTION");
       const respondBy = await this.sla.dueAfter(tx, resolutionDays);
       const ncr = await tx.ncr.create({
         data: {
           number: n, complaintId: c.id, state: "ASSIGNED", priority: d.priority, departmentId: d.departmentId,
-          assigneeId: d.assigneeId, respondBy, triageNotes: d.notes,
+          assigneeId, respondBy, triageNotes: d.notes,
         },
       });
       await tx.transitionLog.create({ data: { ncrId: ncr.id, fromState: null, toState: "ASSIGNED", actorId: user.id, reason: d.priorityChangeReason } });
@@ -94,7 +101,7 @@ export class ComplaintsService {
       await this.sla.start(tx, ncr.id, "RESPONSE", d.priority);
       await this.sla.start(tx, ncr.id, "RESOLUTION", d.priority);
       const managers = await tx.user.findMany({ where: { departmentId: d.departmentId, roles: { some: { role: "DEPT_MANAGER" } } }, select: { id: true } });
-      await this.notify.notify(tx, [d.assigneeId, ...managers.map((m) => m.id)], "NCR_ASSIGNED", `${n} assigned to you`, `${d.priority} priority. Respond by ${respondBy.toDateString()}.`, `/ncr/${n}`);
+      await this.notify.notify(tx, [assigneeId, ...(assigneeId !== d.assigneeId ? [d.assigneeId] : []), ...managers.map((m) => m.id)], "NCR_ASSIGNED", `${n} assigned to you`, `${d.priority} priority. Respond by ${respondBy.toDateString()}.`, `/ncr/${n}`);
       await this.notify.notify(tx, [c.raisedById], "COMPLAINT_ACCEPTED", `${number} accepted as ${n}`, `Assigned to a PIC. Respond by ${respondBy.toDateString()}.`, `/complaints/${number}`);
       return { status: "ACCEPTED", ncrNumber: n };
     });

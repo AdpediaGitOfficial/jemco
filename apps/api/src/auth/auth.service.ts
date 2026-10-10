@@ -4,6 +4,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import type { AuthUser } from "../common/decorators";
 
 const SESSION_HOURS = 12;
+const await_hash = (p: string) => argon2.hash(p);
 
 @Injectable()
 export class AuthService {
@@ -34,7 +35,18 @@ export class AuthService {
     return this.toAuthUser(s.user);
   }
 
-  private toAuthUser(u: { id: string; email: string; name: string; locale: string; departmentId: string | null; roles: { role: string }[] }): AuthUser {
-    return { id: u.id, email: u.email, name: u.name, locale: u.locale, departmentId: u.departmentId, roles: u.roles.map((r) => r.role) };
+  private toAuthUser(u: { id: string; email: string; name: string; locale: string; departmentId: string | null; emailEnabled: boolean; outOfOffice: boolean; mustChangePassword: boolean; roles: { role: string }[] }): AuthUser {
+    return { id: u.id, email: u.email, name: u.name, locale: u.locale, departmentId: u.departmentId, emailEnabled: u.emailEnabled, outOfOffice: u.outOfOffice, mustChangePassword: u.mustChangePassword, roles: u.roles.map((r) => r.role) };
+  }
+
+  async changePassword(userId: string, current: string, next: string) {
+    const u = await this.db.user.findUniqueOrThrow({ where: { id: userId } });
+    if (!(await argon2.verify(u.passwordHash, current))) throw new UnauthorizedException({ message: "validation", fields: { current: "wrong" } });
+    const passwordHash = await await_hash(next);
+    await this.db.asActor(userId, (tx) => tx.user.update({ where: { id: userId }, data: { passwordHash, mustChangePassword: false } }));
+  }
+
+  async updatePrefs(userId: string, p: { locale?: string; emailEnabled?: boolean; outOfOffice?: boolean }) {
+    return this.db.asActor(userId, (tx) => tx.user.update({ where: { id: userId }, data: p }));
   }
 }

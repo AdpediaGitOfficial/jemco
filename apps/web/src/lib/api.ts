@@ -19,7 +19,7 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
   return body as T;
 }
 
-export type Me = { id: string; email: string; name: string; locale: string; departmentId: string | null; roles: string[] };
+export type Me = { id: string; email: string; name: string; locale: string; departmentId: string | null; roles: string[]; emailEnabled: boolean; outOfOffice: boolean; mustChangePassword: boolean };
 export type Lookup = { list: string; code: string; labelEn: string; labelMs: string; helpEn: string | null; helpMs: string | null };
 export type Lookups = Record<string, Lookup[]>;
 export type TodoItem = { kind: "COMPLAINT" | "NCR"; number: string; title: string; action: string; priority: string; dueAt: string | null; link: string };

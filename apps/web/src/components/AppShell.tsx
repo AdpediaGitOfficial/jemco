@@ -17,6 +17,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { data: me, isError, isLoading } = useMe();
 
   useEffect(() => { if (isError) router.replace(`/login?next=${encodeURIComponent(path)}`); }, [isError, router, path]);
+  useEffect(() => { if (me?.mustChangePassword && path !== "/account") router.replace("/account"); }, [me, path, router]);
   if (isLoading || !me) return <div className="p-8 text-grey-60">…</div>;
 
   const qa = hasRole(me, "QA_COORDINATOR", "QA_MANAGER");
@@ -27,6 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     ...(qa ? [{ href: "/qa/triage", label: t("nav.triage") }, { href: "/qa/verify", label: t("nav.verify") }] : []),
     ...(qa || hasRole(me, "PIC", "DEPT_MANAGER", "AUDITOR") ? [{ href: "/ncr", label: t("nav.ncrs") }] : []),
     ...(qa || hasRole(me, "DEPT_MANAGER", "AUDITOR") ? [{ href: "/dashboard", label: t("nav.dashboard") }, { href: "/register", label: t("nav.register") }] : []),
+    ...(hasRole(me, "QA_MANAGER") ? [{ href: "/admin", label: t("nav.admin") }] : []),
   ];
 
   return (
@@ -40,8 +42,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2 text-sm">
-            <span className="hidden sm:inline text-grey-60">{me.name}</span>
-            <button className="btn-ghost text-sm min-h-10 px-2 whitespace-nowrap" aria-label={t("app.language")} onClick={async () => { await setLocale(locale === "en" ? "ms" : "en"); router.refresh(); }}>{locale === "en" ? "BM" : "EN"}</button>
+            <Link href="/account" className="hidden sm:inline text-grey-60 hover:text-ink">{me.name}</Link>
+            <button className="btn-ghost text-sm min-h-10 px-2 whitespace-nowrap" aria-label={t("app.language")} onClick={async () => { const l = locale === "en" ? "ms" : "en"; await setLocale(l); api("/auth/me", { method: "PATCH", json: { locale: l } }).catch(() => {}); router.refresh(); }}>{locale === "en" ? "BM" : "EN"}</button>
             <button className="btn-ghost text-sm min-h-10 px-2 whitespace-nowrap" onClick={async () => { await api("/auth/logout", { method: "POST" }); router.replace("/login"); }}>{t("app.signOut")}</button>
           </div>
         </div>

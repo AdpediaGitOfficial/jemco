@@ -14,12 +14,12 @@ export class NotificationsService {
   async notify(tx: Prisma.TransactionClient | PrismaService, userIds: string[], event: string, subject: string, body: string, link?: string) {
     const ids = [...new Set(userIds.filter(Boolean))];
     if (!ids.length) return;
-    await tx.notification.createMany({ data: ids.map((userId) => ({ userId, event, subject, body, link })) });
+    await tx.notification.createMany({ data: ids.flatMap((userId) => [{ userId, event, subject, body, link, channel: "IN_APP" }, { userId, event, subject, body, link, channel: "EMAIL" }]) });
     this.log.log(`${event} -> ${ids.length} user(s): ${subject}`);
   }
 
   forUser(userId: string) {
-    return this.db.notification.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 50 });
+    return this.db.notification.findMany({ where: { userId, channel: "IN_APP" }, orderBy: { createdAt: "desc" }, take: 50 });
   }
 
   async markRead(userId: string, id: string) {
