@@ -52,6 +52,14 @@ Every notification is queued twice: `IN_APP` (shown in the app) and `EMAIL`. A j
 
 On closure an effectiveness review is scheduled 90 working days out. A daily job (08:30) reminds QA 7 days before and once when overdue; reviews due within 7 days appear in QA's to-do. QA records Effective, Not effective or Not applicable on the NCR page; Not effective opens a follow-up NCR linked as a recurrence, assigned to the same PIC with fresh clocks. `POST /v1/admin/jobs/{effectiveness|sla|mail|digest}` runs any scheduled job on demand (QA manager).
 
+## Single sign-on
+
+Set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` and `OIDC_REDIRECT_URI` (see `.env.example`; Google Workspace and Microsoft 365 values are given there) and the login page shows a "Sign in with …" button. Sign-in is authorization code + PKCE with ID-token verification. `OIDC_ALLOWED_DOMAINS` restricts which email domains may sign in; with `OIDC_AUTO_PROVISION=true` a first sign-in from an allowed domain creates an Issuer account (the QA manager raises roles in Admin). Password sign-in stays available for accounts created in Admin.
+
+## Supplier and customer scorecards
+
+`GET /v1/reports/partners/supplier|customer?months=N` (and `/csv`) gives, per supplier or customer: NCRs, open, quantity affected, cost, disposition counts (returned, credit note, repaired by supplier, reworked), average days to close, urgent/high count and last NCR date. The page at `/reports/partners` charts the top 10 by cost and links each row to its NCRs in the register.
+
 ## Checks
 
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` — the same four CI runs.

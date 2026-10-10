@@ -21,6 +21,12 @@ export class AuthService {
     return { sessionId: s.id, user: this.toAuthUser(u) };
   }
 
+  /** Session for an already-verified user (SSO). */
+  async sessionFor(userId: string): Promise<string> {
+    const s = await this.db.session.create({ data: { userId, expiresAt: new Date(Date.now() + SESSION_HOURS * 3600_000) } });
+    return s.id;
+  }
+
   async logout(sessionId: string) {
     await this.db.session.deleteMany({ where: { id: sessionId } });
   }

@@ -14,14 +14,18 @@
     "dashboard": "Dashboard",
     "register": "Register",
     "admin": "Admin",
-    "account": "Account"
+    "account": "Account",
+    "partners": "Suppliers & customers"
   },
   "login": {
     "title": "Sign in",
     "email": "Work email",
     "password": "Password",
     "button": "Sign in",
-    "failed": "Wrong email or password"
+    "failed": "Wrong email or password",
+    "sso": "Sign in with {label}",
+    "or": "or with your password",
+    "ssoError": "Single sign-on failed: {msg}"
   },
   "todo": {
     "title": "Your to-do",
@@ -322,5 +326,27 @@
     "field": "Field",
     "from": "From",
     "to": "To"
+  },
+  "partners": {
+    "title": "Scorecard",
+    "supplier": "Suppliers",
+    "customer": "Customers",
+    "months": "Last {n} months",
+    "export": "Download CSV",
+    "name": "Name",
+    "ncrs": "NCRs",
+    "open": "Open",
+    "quantity": "Qty affected",
+    "cost": "Cost (RM)",
+    "returned": "Returned",
+    "credit": "Credit notes",
+    "repaired": "Repaired by supplier",
+    "rework": "Reworked",
+    "avgDays": "Avg days to close",
+    "urgentHigh": "Urgent/High",
+    "lastAt": "Last NCR",
+    "chart": "Cost of non-conformance by {kind} (RM)",
+    "empty": "No NCRs linked to a {kind} in this period.",
+    "viewNcrs": "View NCRs"
   }
 }

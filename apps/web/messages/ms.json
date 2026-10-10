@@ -14,14 +14,18 @@
     "dashboard": "Papan pemuka",
     "register": "Daftar",
     "admin": "Pentadbir",
-    "account": "Akaun"
+    "account": "Akaun",
+    "partners": "Pembekal & pelanggan"
   },
   "login": {
     "title": "Log masuk",
     "email": "E-mel kerja",
     "password": "Kata laluan",
     "button": "Log masuk",
-    "failed": "E-mel atau kata laluan salah"
+    "failed": "E-mel atau kata laluan salah",
+    "sso": "Log masuk dengan {label}",
+    "or": "atau dengan kata laluan",
+    "ssoError": "Log masuk tunggal gagal: {msg}"
   },
   "todo": {
     "title": "Tugasan anda",
@@ -322,5 +326,27 @@
     "field": "Medan",
     "from": "Dari",
     "to": "Kepada"
+  },
+  "partners": {
+    "title": "Kad skor",
+    "supplier": "Pembekal",
+    "customer": "Pelanggan",
+    "months": "{n} bulan lepas",
+    "export": "Muat turun CSV",
+    "name": "Nama",
+    "ncrs": "NCR",
+    "open": "Terbuka",
+    "quantity": "Kuantiti terjejas",
+    "cost": "Kos (RM)",
+    "returned": "Dipulangkan",
+    "credit": "Nota kredit",
+    "repaired": "Dibaiki pembekal",
+    "rework": "Kerja semula",
+    "avgDays": "Purata hari tutup",
+    "urgentHigh": "Segera/Tinggi",
+    "lastAt": "NCR terakhir",
+    "chart": "Kos ketidakpatuhan mengikut {kind} (RM)",
+    "empty": "Tiada NCR dikaitkan dengan {kind} dalam tempoh ini.",
+    "viewNcrs": "Lihat NCR"
   }
 }

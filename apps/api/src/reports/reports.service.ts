@@ -110,6 +110,36 @@ export class ReportsService {
       WHERE true ${s} ORDER BY n.created_at DESC`;
   }
 
+  /**
+   * Scorecard per supplier or customer over the period: NCR counts, quantity, cost,
+   * disposition mix, open items and average days to close. Sorted by cost, then count.
+   */
+  async partners(user: AuthUser, kind: "supplier" | "customer", months = 12) {
+    const s = this.scope(user);
+    const since = new Date(); since.setMonth(since.getMonth() - months); since.setDate(1);
+    const col = kind === "supplier" ? Prisma.sql`c.supplier_name` : Prisma.sql`c.customer_name`;
+    const rows = await this.db.$queryRaw<{ name: string; ncrs: number; open: number; quantity: number; cost: number; returned: number; credit: number; repaired: number; rework: number; avg_days: number | null; last_at: Date; urgent_high: number }[]>`
+      SELECT ${col} AS name,
+        count(*)::int AS ncrs,
+        count(*) FILTER (WHERE n.state <> 'CLOSED' AND n.state <> 'REJECTED')::int AS open,
+        coalesce(sum(c.quantity), 0)::float AS quantity,
+        coalesce(sum(n.cost_of_nc), 0)::float AS cost,
+        count(*) FILTER (WHERE 'RETURN_TO_SUPPLIER' = ANY(n.dispositions))::int AS returned,
+        count(*) FILTER (WHERE 'CREDIT_NOTE' = ANY(n.dispositions))::int AS credit,
+        count(*) FILTER (WHERE 'REPAIR_BY_SUPPLIER' = ANY(n.dispositions))::int AS repaired,
+        count(*) FILTER (WHERE 'REWORK_INTERNAL' = ANY(n.dispositions))::int AS rework,
+        avg(working_days_between(n.created_at::date, n.verified_at::date)) FILTER (WHERE n.state = 'CLOSED')::float AS avg_days,
+        max(n.created_at) AS last_at,
+        count(*) FILTER (WHERE n.priority IN ('URGENT', 'HIGH'))::int AS urgent_high
+      FROM ncrs n JOIN complaints c ON c.id = n.complaint_id
+      WHERE ${col} IS NOT NULL AND ${col} <> '' AND n.created_at >= ${since} ${s}
+      GROUP BY ${col} ORDER BY cost DESC, ncrs DESC`;
+    return {
+      since: since.toISOString().slice(0, 10), kind,
+      rows: rows.map((r) => ({ name: r.name, ncrs: r.ncrs, open: r.open, quantity: r.quantity, cost: r.cost, returned: r.returned, credit: r.credit, repaired: r.repaired, rework: r.rework, avgDays: r.avg_days == null ? null : Math.round(r.avg_days * 10) / 10, lastAt: r.last_at.toISOString().slice(0, 10), urgentHigh: r.urgent_high })),
+    };
+  }
+
   toCsv(rows: Record<string, unknown>[]): string {
     if (!rows.length) return "";
     const cols = Object.keys(rows[0]);

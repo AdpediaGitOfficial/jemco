@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { api } from "@/lib/api";
@@ -11,10 +12,11 @@ const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/v1";
 type Row = Record<string, string | number | null>;
 
 /** Every NCR, filterable by any text, exportable as CSV. QA, management, auditors. */
-export default function RegisterPage() {
+function Register() {
   const t = useTranslations("register");
+  const params = useSearchParams();
   const { data } = useQuery<Row[]>({ queryKey: ["register"], queryFn: () => api("/reports/register") });
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(params.get("q") ?? "");
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return (data ?? []).filter((r) => !needle || Object.values(r).some((v) => v != null && String(v).toLowerCase().includes(needle)));
@@ -46,3 +48,4 @@ export default function RegisterPage() {
     </AppShell>
   );
 }
+export default function RegisterPage() { return <Suspense><Register /></Suspense>; }
