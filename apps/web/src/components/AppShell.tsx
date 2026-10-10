@@ -35,20 +35,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/todo" className="flex items-center gap-2 shrink-0"><Image src="/logo.png" alt="JEMCO" width={110} height={34} priority /></Link>
           <nav className="hidden md:flex gap-1 ml-4">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className={`px-3 py-2 rounded-lg text-sm font-semibold ${path.startsWith(l.href) ? "bg-surface text-ink" : "text-grey-60 hover:text-ink"}`}>{l.label}</Link>
+              <Link key={l.href} href={l.href} className={`px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${path.startsWith(l.href) ? "bg-surface text-ink" : "text-grey-60 hover:text-ink"}`}>{l.label}</Link>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2 text-sm">
             <span className="hidden sm:inline text-grey-60">{me.name}</span>
-            <button className="btn-ghost text-sm min-h-10 px-2" onClick={async () => { await setLocale(locale === "en" ? "ms" : "en"); router.refresh(); }}>{t("app.language")}</button>
-            <button className="btn-ghost text-sm min-h-10 px-2" onClick={async () => { await api("/auth/logout", { method: "POST" }); router.replace("/login"); }}>{t("app.signOut")}</button>
+            <button className="btn-ghost text-sm min-h-10 px-2 whitespace-nowrap" aria-label={t("app.language")} onClick={async () => { await setLocale(locale === "en" ? "ms" : "en"); router.refresh(); }}>{locale === "en" ? "BM" : "EN"}</button>
+            <button className="btn-ghost text-sm min-h-10 px-2 whitespace-nowrap" onClick={async () => { await api("/auth/logout", { method: "POST" }); router.replace("/login"); }}>{t("app.signOut")}</button>
           </div>
         </div>
       </header>
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-6">{children}</main>
       <nav className="md:hidden sticky bottom-0 bg-white border-t border-grey-20 flex">
         {links.slice(0, 4).map((l) => (
-          <Link key={l.href} href={l.href} className={`flex-1 text-center py-3 text-xs font-semibold ${path.startsWith(l.href) ? "text-brand" : "text-grey-60"}`}>{l.label}</Link>
+          <Link key={l.href} href={l.href} className={`flex-1 text-center py-3 text-xs font-semibold whitespace-nowrap ${path.startsWith(l.href) ? "text-brand" : "text-grey-60"}`}>{l.label}</Link>
         ))}
       </nav>
     </div>

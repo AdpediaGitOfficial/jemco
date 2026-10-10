@@ -4,7 +4,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/lib/providers";
 import "./globals.css";
 
-export const metadata: Metadata = { title: "JEMCO NCR", description: "Complaint and non-conformance reporting" };
+export const metadata: Metadata = { title: "JEMCO NCR", description: "Complaint and non-conformance reporting", icons: { icon: "/icon.png" } };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, maximumScale: 1 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
