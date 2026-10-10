@@ -1,44 +1,228 @@
 {
-  "app": { "name": "JEMCO NCR", "signOut": "Sign out", "language": "Bahasa Malaysia" },
-  "nav": { "todo": "Your to-do", "new": "Report a problem", "complaints": "My reports", "triage": "Triage", "verify": "Verify", "ncrs": "NCRs" },
-  "login": { "title": "Sign in", "email": "Work email", "password": "Password", "button": "Sign in", "failed": "Wrong email or password" },
-  "todo": {
-    "title": "Your to-do", "empty": "Nothing waiting for you. Well done.", "due": "Due {date}", "overdue": "Overdue since {date}",
-    "action": { "ANSWER": "Answer QA", "TRIAGE": "Triage", "START": "Start", "CONTINUE": "Continue", "REWORK": "Fix and resubmit", "VERIFY": "Verify", "WATCH": "View" }
+  "app": {
+    "name": "JEMCO NCR",
+    "signOut": "Sign out",
+    "language": "Bahasa Malaysia"
   },
-  "priority": { "LOW": "Low", "MEDIUM": "Medium", "HIGH": "High", "URGENT": "Urgent" },
+  "nav": {
+    "todo": "Your to-do",
+    "new": "Report a problem",
+    "complaints": "My reports",
+    "triage": "Triage",
+    "verify": "Verify",
+    "ncrs": "NCRs",
+    "dashboard": "Dashboard",
+    "register": "Register"
+  },
+  "login": {
+    "title": "Sign in",
+    "email": "Work email",
+    "password": "Password",
+    "button": "Sign in",
+    "failed": "Wrong email or password"
+  },
+  "todo": {
+    "title": "Your to-do",
+    "empty": "Nothing waiting for you. Well done.",
+    "due": "Due {date}",
+    "overdue": "Overdue since {date}",
+    "action": {
+      "ANSWER": "Answer QA",
+      "TRIAGE": "Triage",
+      "START": "Start",
+      "CONTINUE": "Continue",
+      "REWORK": "Fix and resubmit",
+      "VERIFY": "Verify",
+      "WATCH": "View"
+    }
+  },
+  "priority": {
+    "LOW": "Low",
+    "MEDIUM": "Medium",
+    "HIGH": "High",
+    "URGENT": "Urgent"
+  },
   "status": {
-    "SUBMITTED": "Waiting for QA", "NEED_MORE_INFO": "QA has a question", "REJECTED": "Not accepted", "ACCEPTED": "Accepted",
-    "ASSIGNED": "Assigned", "IN_PROGRESS": "In progress", "AWAITING_VERIFICATION": "Waiting for QA to verify", "RETURNED": "Returned for more work", "CLOSED": "Closed"
+    "SUBMITTED": "Waiting for QA",
+    "NEED_MORE_INFO": "QA has a question",
+    "REJECTED": "Not accepted",
+    "ACCEPTED": "Accepted",
+    "ASSIGNED": "Assigned",
+    "IN_PROGRESS": "In progress",
+    "AWAITING_VERIFICATION": "Waiting for QA to verify",
+    "RETURNED": "Returned for more work",
+    "CLOSED": "Closed"
   },
   "new": {
-    "title": "Report a problem", "step": "Step {n} of {total}", "back": "Back", "next": "Next", "send": "Send to QA",
-    "s1": { "title": "What kind of problem is it?" },
-    "s2": { "title": "Where did it happen?", "process": "Which process?", "source": "Who found it?", "other": "Please state" },
-    "s3": { "title": "Who is involved?", "customer": "Customer name", "supplier": "Supplier name", "po": "PO or DO number", "delivery": "Date of delivery (if known)", "cef": "CEF number (if any)", "qty": "Quantity affected", "unit": "Unit" },
-    "s4": { "title": "How urgent is it?" },
-    "s5": { "title": "Tell us what happened", "help": "Write at least a few sentences. What was expected, what you found, and where it is now.", "placeholder": "For example: Customer received 20 brackets with powder coat peeling on the edge…", "min": "Please write at least 50 characters ({n} so far)" },
-    "s6": { "title": "Check and send", "edit": "Change" },
-    "done": { "title": "Sent. Your number is {number}", "body": "QA will look at it and you will be told what happens next. Keep this number for any questions.", "another": "Report another", "todo": "Back to your to-do" }
+    "title": "Report a problem",
+    "step": "Step {n} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "send": "Send to QA",
+    "s1": {
+      "title": "What kind of problem is it?"
+    },
+    "s2": {
+      "title": "Where did it happen?",
+      "process": "Which process?",
+      "source": "Who found it?",
+      "other": "Please state"
+    },
+    "s3": {
+      "title": "Who is involved?",
+      "customer": "Customer name",
+      "supplier": "Supplier name",
+      "po": "PO or DO number",
+      "delivery": "Date of delivery (if known)",
+      "cef": "CEF number (if any)",
+      "qty": "Quantity affected",
+      "unit": "Unit"
+    },
+    "s4": {
+      "title": "How urgent is it?"
+    },
+    "s5": {
+      "title": "Tell us what happened",
+      "help": "Write at least a few sentences. What was expected, what you found, and where it is now.",
+      "placeholder": "For example: Customer received 20 brackets with powder coat peeling on the edge…",
+      "min": "Please write at least 50 characters ({n} so far)"
+    },
+    "s6": {
+      "title": "Add photos",
+      "help": "A photo of the problem helps QA and the PIC act faster. Optional, but strongly recommended."
+    },
+    "done": {
+      "title": "Sent. Your number is {number}",
+      "body": "QA will look at it and you will be told what happens next. Keep this number for any questions.",
+      "another": "Report another",
+      "todo": "Back to your to-do"
+    },
+    "s7": {
+      "title": "Check and send",
+      "edit": "Change"
+    }
   },
-  "complaint": { "title": "Report {number}", "question": "QA asks:", "answer": "Your answer", "send": "Send answer", "rejected": "QA did not accept this report", "ncr": "Handled as NCR {number}" },
+  "complaint": {
+    "title": "Report {number}",
+    "question": "QA asks:",
+    "answer": "Your answer",
+    "send": "Send answer",
+    "rejected": "QA did not accept this report",
+    "ncr": "Handled as NCR {number}"
+  },
   "triage": {
-    "title": "Triage", "queue": "Waiting for triage", "empty": "The triage queue is empty.",
-    "decision": "Your decision", "accept": "Accept and assign", "reject": "Do not accept", "ask": "Ask the issuer a question",
-    "priority": "Confirm priority", "priorityReason": "Why change the priority?", "department": "Department", "assignee": "Person in charge", "notes": "Notes for the PIC (optional)",
-    "reason": "Reason", "reasonText": "Explain to the issuer", "question": "Your question", "submit": "Confirm",
-    "rejectReason": { "DUPLICATE": "Duplicate of another report", "NOT_NC": "Not a non-conformance", "INSUFFICIENT_INFO": "Not enough information", "OUT_OF_SCOPE": "Outside our scope", "OTHER": "Other" }
+    "title": "Triage",
+    "queue": "Waiting for triage",
+    "empty": "The triage queue is empty.",
+    "decision": "Your decision",
+    "accept": "Accept and assign",
+    "reject": "Do not accept",
+    "ask": "Ask the issuer a question",
+    "priority": "Confirm priority",
+    "priorityReason": "Why change the priority?",
+    "department": "Department",
+    "assignee": "Person in charge",
+    "notes": "Notes for the PIC (optional)",
+    "reason": "Reason",
+    "reasonText": "Explain to the issuer",
+    "question": "Your question",
+    "submit": "Confirm",
+    "rejectReason": {
+      "DUPLICATE": "Duplicate of another report",
+      "NOT_NC": "Not a non-conformance",
+      "INSUFFICIENT_INFO": "Not enough information",
+      "OUT_OF_SCOPE": "Outside our scope",
+      "OTHER": "Other"
+    }
   },
   "ncr": {
-    "title": "NCR {number}", "issue": "The issue", "action": "Your action", "verification": "QA verification", "history": "History",
-    "containment": "What did you do immediately to stop it getting worse?", "rootCause": "Why did it happen? (root cause)", "rootCauseHelp": "Ask \"why?\" up to five times, each time about the previous answer.", "rootCauseCategory": "Root cause category",
-    "plan": "What will you do so it does not happen again?", "actions": "Action items", "addAction": "Add an action item", "actionDesc": "What will be done", "actionOwner": "Who", "actionDue": "By when", "actionDone": "Done",
-    "save": "Save", "submit": "Send to QA for verification", "saved": "Saved", "incomplete": "Before you can send: {items}",
-    "missing": { "rootCause": "write the root cause", "actionPlan": "write the action plan", "actions": "add at least one action item", "actionsDone": "tick every action item as done" },
-    "returned": "QA returned this with the note:", "clock": "{days} working days left", "clockOver": "{days} working days overdue"
+    "title": "{number}",
+    "issue": "The issue",
+    "action": "Your action",
+    "verification": "QA verification",
+    "history": "History",
+    "containment": "What did you do immediately to stop it getting worse?",
+    "rootCause": "Why did it happen? (root cause)",
+    "rootCauseHelp": "Ask \"why?\" up to five times, each time about the previous answer.",
+    "rootCauseCategory": "Root cause category",
+    "plan": "What will you do so it does not happen again?",
+    "actions": "Action items",
+    "addAction": "Add an action item",
+    "actionDesc": "What will be done",
+    "actionOwner": "Who",
+    "actionDue": "By when",
+    "actionDone": "Done",
+    "save": "Save",
+    "submit": "Send to QA for verification",
+    "saved": "Saved",
+    "incomplete": "Before you can send: {items}",
+    "missing": {
+      "rootCause": "write the root cause",
+      "actionPlan": "write the action plan",
+      "actions": "add at least one action item",
+      "actionsDone": "tick every action item as done"
+    },
+    "returned": "QA returned this with the note:",
+    "clock": "{days} working days left",
+    "clockOver": "{days} working days overdue",
+    "evidence": "Evidence (photos, test reports, updated procedures)"
   },
   "verify": {
-    "title": "Verify {number}", "queue": "Waiting for verification", "empty": "Nothing to verify.",
-    "result": "Result", "ok": "Satisfactory: close", "no": "Not satisfactory: return", "dispositions": "Lot disposition", "cost": "Cost of non-conformance (RM)", "justification": "QA justification", "returnReason": "What must the PIC do differently?", "submit": "Confirm"
+    "title": "Verify {number}",
+    "queue": "Waiting for verification",
+    "empty": "Nothing to verify.",
+    "result": "Result",
+    "ok": "Satisfactory: close",
+    "no": "Not satisfactory: return",
+    "dispositions": "Lot disposition",
+    "cost": "Cost of non-conformance (RM)",
+    "justification": "QA justification",
+    "returnReason": "What must the PIC do differently?",
+    "submit": "Confirm"
+  },
+  "photos": {
+    "camera": "Take a photo",
+    "choose": "Choose files",
+    "remove": "Remove",
+    "uploading": "Uploading…",
+    "hint": "{n} of 10 attached. Photos, PDF or drawings, up to 25 MB each.",
+    "error": {
+      "type": "That file type is not allowed",
+      "size": "That file is larger than 25 MB",
+      "generic": "Upload failed. Check your connection and try again."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "months": "Last {n} months",
+    "open": "Open NCRs",
+    "overdue": "Overdue",
+    "newMonth": "New this month",
+    "closedMonth": "Closed this month",
+    "cycle": "Average days to close",
+    "sla": "SLA met",
+    "repeat": "Repeat issues",
+    "opened": "Opened",
+    "closed": "Closed",
+    "byProcess": "NCRs by process",
+    "bySource": "NCRs by source",
+    "rootCause": "Root cause categories",
+    "cost": "Cost of non-conformance by disposition (RM)",
+    "returnRate": "Returned from verification, by department",
+    "overdueList": "Overdue now",
+    "noData": "No data yet",
+    "days": "days",
+    "daysOver": "{n} working days over",
+    "openByState": "Open by state",
+    "cycleByPriority": "Days to close, by priority",
+    "table": "Table",
+    "newVsClosedWeek": "Opened and closed per week",
+    "newVsClosedMonth": "Opened and closed per month"
+  },
+  "register": {
+    "title": "NCR register",
+    "export": "Download CSV",
+    "count": "{n} records",
+    "filter": "Filter"
   }
 }

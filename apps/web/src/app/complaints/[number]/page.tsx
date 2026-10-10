@@ -6,8 +6,9 @@ import { api } from "@/lib/api";
 import { AppShell } from "@/components/AppShell";
 import { Field, PageTitle, PriorityChip, StatusChip } from "@/components/ui";
 import { useLabel, useLookups } from "@/lib/hooks";
+import { AttachmentList, type Attachment } from "@/components/PhotoField";
 
-type C = { number: string; status: string; priority: string; type: string; source: string; process: string; customerName: string | null; supplierName: string | null; poDoNumber: string; quantity: string; quantityUnit: string; description: string; raisedAt: string; infoQuestion: string | null; infoAnswer: string | null; rejectionText: string | null; ncr: { number: string; state: string } | null };
+type C = { number: string; status: string; priority: string; type: string; source: string; process: string; customerName: string | null; supplierName: string | null; poDoNumber: string; quantity: string; quantityUnit: string; description: string; raisedAt: string; infoQuestion: string | null; infoAnswer: string | null; rejectionText: string | null; ncr: { number: string; state: string } | null; attachments: Attachment[] };
 
 export default function ComplaintPage({ params }: { params: Promise<{ number: string }> }) {
   const { number } = use(params);
@@ -37,6 +38,7 @@ export default function ComplaintPage({ params }: { params: Promise<{ number: st
         {c.customerName && <div>{c.customerName}</div>}{c.supplierName && <div>{c.supplierName}</div>}
         <div>PO/DO {c.poDoNumber} · {c.quantity} {name("unit", c.quantityUnit)}</div>
         <p className="whitespace-pre-wrap pt-2 text-base">{c.description}</p>
+        <AttachmentList items={c.attachments ?? []} />
         {c.infoAnswer && <p className="pt-2 border-t border-grey-20"><span className="text-grey-60">{t("answer")}:</span> {c.infoAnswer}</p>}
       </div>
     </AppShell>

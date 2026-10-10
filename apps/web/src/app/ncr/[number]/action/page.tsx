@@ -8,6 +8,7 @@ import { useLabel, useLookups, useMe } from "@/lib/hooks";
 import { AppShell } from "@/components/AppShell";
 import { Field, PageTitle, PriorityChip, StatusChip, ClockBar } from "@/components/ui";
 import type { NcrDetail } from "@/components/NcrSummary";
+import { PhotoField, type Attachment } from "@/components/PhotoField";
 
 type Item = { id?: string; description: string; ownerId: string; dueDate: string; done: boolean };
 
@@ -22,11 +23,13 @@ export default function ActionPage({ params }: { params: Promise<{ number: strin
   const [f, setF] = useState({ containment: "", rootCause: "", rootCauseCategory: "", actionPlan: "" });
   const [items, setItems] = useState<Item[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [evidence, setEvidence] = useState<Attachment[]>([]);
   const [msg, setMsg] = useState(""); const [err, setErr] = useState("");
   useEffect(() => {
     if (n && !loaded) {
       setF({ containment: n.containment ?? "", rootCause: n.rootCause ?? "", rootCauseCategory: n.rootCauseCategory ?? "", actionPlan: n.actionPlan ?? "" });
       setItems(n.actions.map((a) => ({ id: a.id, description: a.description, ownerId: a.ownerId, dueDate: a.dueDate.slice(0, 10), done: a.done })));
+      setEvidence(n.attachments ?? []);
       setLoaded(true);
     }
   }, [n, loaded]);
@@ -71,6 +74,7 @@ export default function ActionPage({ params }: { params: Promise<{ number: strin
             ))}</div>
             <button className="btn-secondary mt-3" onClick={addItem}>+ {t("addAction")}</button>
           </div>
+          <Field label={t("evidence")}><PhotoField value={evidence} onChange={setEvidence} ncrId={n.id} canRemove={false} /></Field>
           {msg && <div className="text-ok text-sm">{msg}</div>}
           {err && <div className="error">{err}</div>}
           <div className="flex gap-3 justify-end pt-2">

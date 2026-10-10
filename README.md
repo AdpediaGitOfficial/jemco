@@ -22,10 +22,19 @@ pnpm --filter @jemco/shared build
 pnpm --filter @jemco/api db:generate
 pnpm --filter @jemco/api db:migrate:dev
 pnpm --filter @jemco/api db:seed
+pnpm --filter @jemco/api db:demo           # optional: 60 realistic NCRs for the dashboard
 pnpm dev                                   # web :3000, api :4000
 ```
 
 Seeded sign-ins (password `jemco1234`): `sales@jemco.local` (issuer), `aishah@jemco.local` (QA coordinator), `qa.manager@jemco.local`, `rahman@jemco.local` / `pc.pic@jemco.local` / `wh.pic@jemco.local` / `pur.pic@jemco.local` / `log.pic@jemco.local` (PICs), `prod.manager@jemco.local`, `auditor@jemco.local`.
+
+## Attachments
+
+Uploads go through the API (`POST /v1/attachments`, 25 MB, images/PDF/DWG/DXF) and are stored on local disk by default (`apps/api/uploads/`). Set `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` to use any S3-compatible bucket (R2, MinIO, AWS) instead. Photos are shrunk in the browser before upload. Evidence linked to a record can never be deleted.
+
+## Reports
+
+`GET /v1/reports/management?months=12` feeds the dashboard (department managers see their department only); `GET /v1/reports/register.csv` exports every NCR. Both are SQL so the screen and the export share one definition.
 
 ## Checks
 

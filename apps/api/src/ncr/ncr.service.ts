@@ -10,7 +10,7 @@ const isQA = (u: AuthUser) => u.roles.includes("QA_COORDINATOR") || u.roles.incl
 const EFFECTIVENESS_DAYS = 90;
 
 const detail = {
-  complaint: { select: { number: true, type: true, source: true, process: true, customerName: true, supplierName: true, poDoNumber: true, quantity: true, quantityUnit: true, description: true, raisedAt: true, raisedBy: { select: { name: true } } } },
+  complaint: { select: { number: true, type: true, source: true, process: true, customerName: true, supplierName: true, poDoNumber: true, quantity: true, quantityUnit: true, description: true, raisedAt: true, raisedBy: { select: { name: true } }, attachments: true } },
   department: { select: { name: true } },
   assignee: { select: { id: true, name: true } },
   verifiedBy: { select: { name: true } },

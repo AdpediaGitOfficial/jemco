@@ -8,8 +8,9 @@ import { api, ApiError } from "@/lib/api";
 import { useLabel, useLookups } from "@/lib/hooks";
 import { AppShell } from "@/components/AppShell";
 import { ChoiceCards, Field, PageTitle } from "@/components/ui";
+import { PhotoField, type Attachment } from "@/components/PhotoField";
 
-const TOTAL = 6;
+const TOTAL = 7;
 const DRAFT_KEY = "jemco.newComplaint";
 
 /** Six steps, one question each. Draft is kept in localStorage so a lost signal loses nothing. */
@@ -22,11 +23,12 @@ export default function NewComplaintPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [doneNumber, setDoneNumber] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<Attachment[]>([]);
   const set = (patch: Partial<CreateComplaintInput>) => { const n = { ...v, ...patch }; setV(n); try { localStorage.setItem(DRAFT_KEY, JSON.stringify(n)); } catch {} };
 
   const send = useMutation({
-    mutationFn: () => api<{ number: string }>("/complaints", { method: "POST", json: { ...v, quantity: Number(v.quantity), attachmentIds: [] } }),
-    onSuccess: (r) => { setDoneNumber(r.number); try { localStorage.removeItem(DRAFT_KEY); } catch {} },
+    mutationFn: () => api<{ number: string }>("/complaints", { method: "POST", json: { ...v, quantity: Number(v.quantity), attachmentIds: photos.map((a) => a.id) } }),
+    onSuccess: (r) => { setDoneNumber(r.number); setPhotos([]); try { localStorage.removeItem(DRAFT_KEY); } catch {} },
     onError: (e) => { if (e instanceof ApiError) setErrors(e.fields); },
   });
 
@@ -42,7 +44,7 @@ export default function NewComplaintPage() {
     }
   };
   const submit = () => {
-    const r = CreateComplaintSchema.safeParse({ ...v, quantity: Number(v.quantity), attachmentIds: [] });
+    const r = CreateComplaintSchema.safeParse({ ...v, quantity: Number(v.quantity), attachmentIds: photos.map((a) => a.id) });
     if (!r.success) { const f: Record<string, string> = {}; for (const i of r.error.issues) f[i.path.join(".")] = i.message; setErrors(f); return; }
     send.mutate();
   };
@@ -88,10 +90,14 @@ export default function NewComplaintPage() {
           {(v.description?.trim().length ?? 0) < 50 && <div className="help">{t("s5.min", { n: v.description?.trim().length ?? 0 })}</div>}
         </>}
         {step === 6 && <>
-          <h2 className="text-xl font-semibold">{t("s6.title")}</h2>
+          <h2 className="text-xl font-semibold">{t("s6.title")}</h2><p className="help">{t("s6.help")}</p>
+          <PhotoField value={photos} onChange={setPhotos} />
+        </>}
+        {step === 7 && <>
+          <h2 className="text-xl font-semibold">{t("s7.title")}</h2>
           <dl className="space-y-2 text-sm">
-            {([[1, name("type", v.type)], [2, `${name("process", v.process)} · ${name("source", v.source)}`], [3, `${v.customerName ?? v.supplierName ?? ""} PO/DO ${v.poDoNumber} · ${v.quantity} ${name("unit", v.quantityUnit)}`], [4, name("priority", v.priority)], [5, v.description]] as [number, string | undefined][]).map(([s, val]) => (
-              <div key={s} className="flex gap-3 border-b border-grey-20 pb-2"><dd className="flex-1 whitespace-pre-wrap">{val}</dd><button className="text-brand text-sm font-semibold" onClick={() => setStep(s)}>{t("s6.edit")}</button></div>
+            {([[1, name("type", v.type)], [2, `${name("process", v.process)} · ${name("source", v.source)}`], [3, `${v.customerName ?? v.supplierName ?? ""} PO/DO ${v.poDoNumber} · ${v.quantity} ${name("unit", v.quantityUnit)}`], [4, name("priority", v.priority)], [5, v.description], [6, `${photos.length} file(s)`]] as [number, string | undefined][]).map(([s, val]) => (
+              <div key={s} className="flex gap-3 border-b border-grey-20 pb-2"><dd className="flex-1 whitespace-pre-wrap">{val}</dd><button className="text-brand text-sm font-semibold" onClick={() => setStep(s)}>{t("s7.edit")}</button></div>
             ))}
           </dl>
           {Object.keys(errors).length > 0 && <div className="error">{Object.entries(errors).map(([k, m]) => `${k}: ${m}`).join(", ")}</div>}

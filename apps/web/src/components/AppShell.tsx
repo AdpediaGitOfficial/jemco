@@ -26,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: "/complaints", label: t("nav.complaints") },
     ...(qa ? [{ href: "/qa/triage", label: t("nav.triage") }, { href: "/qa/verify", label: t("nav.verify") }] : []),
     ...(qa || hasRole(me, "PIC", "DEPT_MANAGER", "AUDITOR") ? [{ href: "/ncr", label: t("nav.ncrs") }] : []),
+    ...(qa || hasRole(me, "DEPT_MANAGER", "AUDITOR") ? [{ href: "/dashboard", label: t("nav.dashboard") }, { href: "/register", label: t("nav.register") }] : []),
   ];
 
   return (
