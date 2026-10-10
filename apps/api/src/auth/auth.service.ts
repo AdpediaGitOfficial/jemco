@@ -4,17 +4,33 @@ import { PrismaService } from "../prisma/prisma.service";
 import type { AuthUser } from "../common/decorators";
 
 const SESSION_HOURS = 12;
+const MAX_FAILURES = 10, LOCK_MINUTES = 15;
 const await_hash = (p: string) => argon2.hash(p);
 
 @Injectable()
 export class AuthService {
+  private failures = new Map<string, { count: number; until: number }>();
   constructor(private db: PrismaService) {}
 
+  private checkLock(email: string) {
+    const f = this.failures.get(email);
+    if (f && f.count >= MAX_FAILURES && Date.now() < f.until) throw new UnauthorizedException(`too many attempts; try again in ${Math.ceil((f.until - Date.now()) / 60_000)} min`);
+    if (f && Date.now() >= f.until) this.failures.delete(email);
+  }
+  private recordFailure(email: string) {
+    const f = this.failures.get(email) ?? { count: 0, until: 0 };
+    f.count++; f.until = Date.now() + LOCK_MINUTES * 60_000; this.failures.set(email, f);
+  }
+
   async login(email: string, password: string): Promise<{ sessionId: string; user: AuthUser }> {
-    const u = await this.db.user.findUnique({ where: { email: email.toLowerCase() }, include: { roles: true } });
+    const key = email.toLowerCase();
+    this.checkLock(key);
+    const u = await this.db.user.findUnique({ where: { email: key }, include: { roles: true } });
     if (!u || !u.active || !(await argon2.verify(u.passwordHash, password))) {
+      this.recordFailure(key);
       throw new UnauthorizedException("wrong email or password");
     }
+    this.failures.delete(key);
     const s = await this.db.session.create({
       data: { userId: u.id, expiresAt: new Date(Date.now() + SESSION_HOURS * 3600_000) },
     });

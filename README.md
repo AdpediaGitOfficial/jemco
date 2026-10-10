@@ -60,6 +60,10 @@ Set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` and `OIDC_REDIRECT_URI
 
 `GET /v1/reports/partners/supplier|customer?months=N` (and `/csv`) gives, per supplier or customer: NCRs, open, quantity affected, cost, disposition counts (returned, credit note, repaired by supplier, reworked), average days to close, urgent/high count and last NCR date. The page at `/reports/partners` charts the top 10 by cost and links each row to its NCRs in the register.
 
+## Deploy
+
+`apps/api/Dockerfile` and `apps/web/Dockerfile` build production images (the API image includes Chromium for PDFs). `deploy/` holds a Compose stack for one server with Caddy (automatic HTTPS), PostgreSQL, nightly backups and a restore script; see `deploy/README.md`. The `Release images` workflow publishes both images to GHCR on every push to `main` and on `v*` tags.
+
 ## Checks
 
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` — the same four CI runs.

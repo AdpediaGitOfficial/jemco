@@ -9,3 +9,4 @@ coverage/
 .env.*.local
 apps/api/generated/
 apps/api/uploads/
+deploy/.env

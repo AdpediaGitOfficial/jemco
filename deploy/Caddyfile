@@ -1,0 +1,23 @@
+# Automatic HTTPS for {$DOMAIN}. The API is served under /api (its routes are /v1/...).
+{
+	email {$ACME_EMAIL}
+}
+{$DOMAIN} {
+	encode zstd gzip
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+	handle /api/* {
+		uri strip_prefix /api
+		reverse_proxy api:4000
+	}
+	handle {
+		reverse_proxy web:3000
+	}
+	request_body { max_size 30MB }
+	log { output stdout }
+}
