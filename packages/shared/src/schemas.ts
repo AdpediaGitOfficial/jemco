@@ -162,3 +162,10 @@ export const MyPrefsSchema = z.object({
   emailEnabled: z.boolean().optional(),
   outOfOffice: z.boolean().optional(),
 });
+
+/** Effectiveness review after closure (ISO 9001 10.2). QA only. */
+export const EffectivenessSchema = z.object({
+  result: z.enum(["EFFECTIVE", "NOT_EFFECTIVE", "NOT_APPLICABLE"]),
+  notes: z.string().trim().max(3000).optional(),
+});
+export type EffectivenessInput = z.infer<typeof EffectivenessSchema>;

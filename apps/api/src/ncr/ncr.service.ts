@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import type { SaveAction, VerifyInput } from "@jemco/shared";
+import type { EffectivenessInput, SaveAction, VerifyInput } from "@jemco/shared";
 import { PrismaService } from "../prisma/prisma.service";
 import { WorkflowService } from "../workflow/workflow.service";
 import { SlaService } from "../workflow/sla.service";
@@ -134,6 +134,32 @@ export class NcrService {
       await this.notify.notify(tx, [n.assigneeId ?? "", ...managers.map((m) => m.id), ...escalate.map((e) => e.id)], "NCR_RETURNED",
         `${number} returned for further work${returnCount >= 2 ? ` (return ${returnCount})` : ""}`, body.returnReason, `/ncr/${number}`);
       return r;
+    });
+  }
+
+  /** ISO 9001 10.2: was the corrective action effective? Not effective opens a linked follow-up NCR. */
+  async effectiveness(user: AuthUser, number: string, body: EffectivenessInput) {
+    const n = await this.db.ncr.findUnique({ where: { number } });
+    if (!n) throw new NotFoundException();
+    if (n.state !== "CLOSED") throw new ForbiddenException("only a closed NCR can be reviewed");
+    if (n.effectivenessResult) throw new ForbiddenException("already reviewed");
+    return this.db.asActor(user.id, async (tx) => {
+      await tx.ncr.update({ where: { id: n.id }, data: { effectivenessResult: body.result, effectivenessNotes: body.notes, effectivenessReviewedAt: new Date(), effectivenessReviewedById: user.id } });
+      if (body.result !== "NOT_EFFECTIVE") return { result: body.result, followUp: null };
+      const [{ num }] = await tx.$queryRaw<{ num: string }[]>`SELECT next_number('NCR') AS num`;
+      const resolutionDays = await this.sla.daysFor(tx, n.priority, "RESOLUTION");
+      const respondBy = await this.sla.dueAfter(tx, resolutionDays);
+      const follow = await tx.ncr.create({ data: {
+        number: num, state: "ASSIGNED", priority: n.priority, departmentId: n.departmentId, assigneeId: n.assigneeId, respondBy,
+        triageNotes: `Follow-up to ${n.number}: corrective action found not effective. ${body.notes ?? ""}`.trim(),
+      } });
+      await tx.ncrLink.create({ data: { fromId: follow.id, toId: n.id, kind: "RECURRENCE_OF" } });
+      await tx.transitionLog.create({ data: { ncrId: follow.id, fromState: null, toState: "ASSIGNED", actorId: user.id, reason: `Not effective: ${n.number}` } });
+      await this.sla.start(tx, follow.id, "RESPONSE", n.priority);
+      await this.sla.start(tx, follow.id, "RESOLUTION", n.priority);
+      const managers = await tx.user.findMany({ where: { departmentId: n.departmentId, roles: { some: { role: "DEPT_MANAGER" } } }, select: { id: true } });
+      await this.notify.notify(tx, [n.assigneeId ?? "", ...managers.map((m) => m.id)], "NCR_ASSIGNED", `${num} assigned to you (follow-up to ${n.number})`, `The corrective action on ${n.number} was found not effective. Respond by ${respondBy.toDateString()}.`, `/ncr/${num}`);
+      return { result: body.result, followUp: num };
     });
   }
 

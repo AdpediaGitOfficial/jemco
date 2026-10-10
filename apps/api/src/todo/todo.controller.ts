@@ -6,7 +6,7 @@ export interface TodoItem {
   kind: "COMPLAINT" | "NCR";
   number: string;
   title: string;
-  action: "ANSWER" | "TRIAGE" | "START" | "CONTINUE" | "REWORK" | "VERIFY" | "WATCH";
+  action: "ANSWER" | "TRIAGE" | "START" | "CONTINUE" | "REWORK" | "VERIFY" | "WATCH" | "REVIEW";
   priority: string;
   dueAt: string | null;
   link: string;
@@ -31,6 +31,9 @@ export class TodoController {
       for (const c of queue) items.push({ kind: "COMPLAINT", number: c.number, title: c.description.slice(0, 90), action: "TRIAGE", priority: c.priority, dueAt: null, link: `/qa/triage/${c.number}` });
       const verify = await this.db.ncr.findMany({ where: { state: "AWAITING_VERIFICATION" }, include: { clocks: { where: { stoppedAt: null } }, complaint: { select: { description: true } } } });
       for (const n of verify) items.push({ kind: "NCR", number: n.number, title: n.complaint?.description.slice(0, 90) ?? n.number, action: "VERIFY", priority: n.priority, dueAt: n.clocks[0]?.dueAt.toISOString() ?? null, link: `/qa/verify/${n.number}` });
+      const soon = new Date(Date.now() + 7 * 86400_000);
+      const reviews = await this.db.ncr.findMany({ where: { state: "CLOSED", effectivenessResult: null, effectivenessDue: { lte: soon } }, include: { complaint: { select: { description: true } } }, orderBy: { effectivenessDue: "asc" } });
+      for (const n of reviews) items.push({ kind: "NCR", number: n.number, title: n.complaint?.description.slice(0, 90) ?? n.number, action: "REVIEW", priority: n.priority, dueAt: n.effectivenessDue?.toISOString() ?? null, link: `/ncr/${n.number}` });
     }
 
     const mine = await this.db.ncr.findMany({ where: { assigneeId: u.id, state: { in: ["ASSIGNED", "IN_PROGRESS", "RETURNED"] } }, include: { clocks: { where: { stoppedAt: null } }, complaint: { select: { description: true } } } });

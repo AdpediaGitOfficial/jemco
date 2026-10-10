@@ -2,13 +2,16 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query
 import { z } from "zod";
 import { CreateUserSchema, HolidaySchema, LookupOptionPatchSchema, LookupOptionSchema, PatchUserSchema, RoutingSchema, SlaPolicySchema } from "@jemco/shared";
 import { AdminService } from "./admin.service";
+import { EffectivenessScheduler } from "../ncr/effectiveness.scheduler";
+import { SlaScheduler } from "../workflow/sla.scheduler";
+import { MailScheduler } from "../mail/mail.scheduler";
 import { CurrentUser, Roles, type AuthUser } from "../common/decorators";
 import { ZodPipe } from "../common/zod.pipe";
 
 @Roles("QA_MANAGER")
 @Controller("admin")
 export class AdminController {
-  constructor(private svc: AdminService) {}
+  constructor(private svc: AdminService, private effectiveness: EffectivenessScheduler, private slaJob: SlaScheduler, private mailJob: MailScheduler) {}
 
   @Get("lookups") lookups() { return this.svc.lookups(); }
   @Post("lookups/:list") addLookup(@CurrentUser() u: AuthUser, @Param("list") list: string, @Body(new ZodPipe(LookupOptionSchema)) b: z.infer<typeof LookupOptionSchema>) { return this.svc.addLookup(u, list, b); }
@@ -30,4 +33,14 @@ export class AdminController {
   @Post("users/:id/reset-password") reset(@CurrentUser() u: AuthUser, @Param("id") id: string) { return this.svc.resetPassword(u, id); }
 
   @Get("changes") changes() { return this.svc.changeLog(); }
+
+  /** Run a scheduled job now (the same code the cron runs). */
+  @Post("jobs/:name")
+  async runJob(@Param("name") name: string) {
+    if (name === "effectiveness") return { sent: await this.effectiveness.sweep() };
+    if (name === "sla") { await this.slaJob.run(); return { ok: true }; }
+    if (name === "mail") { await this.mailJob.drain(); return { ok: true }; }
+    if (name === "digest") { await this.mailJob.digest(); return { ok: true }; }
+    return { error: "unknown job" };
+  }
 }

@@ -35,7 +35,8 @@
       "CONTINUE": "Continue",
       "REWORK": "Fix and resubmit",
       "VERIFY": "Verify",
-      "WATCH": "View"
+      "WATCH": "View",
+      "REVIEW": "Review effectiveness"
     }
   },
   "priority": {
@@ -167,7 +168,18 @@
     "returned": "QA returned this with the note:",
     "clock": "{days} working days left",
     "clockOver": "{days} working days overdue",
-    "evidence": "Evidence (photos, test reports, updated procedures)"
+    "evidence": "Evidence (photos, test reports, updated procedures)",
+    "pdf": "Download form (PDF)",
+    "effTitle": "Effectiveness review",
+    "effHelp": "90 working days after closure: has the corrective action held? Not effective opens a follow-up NCR assigned to the same PIC.",
+    "effDue": "Due {date}",
+    "EFFECTIVE": "Effective",
+    "NOT_EFFECTIVE": "Not effective",
+    "NOT_APPLICABLE": "Not applicable",
+    "effNotes": "Notes (what you checked)",
+    "effSave": "Record review",
+    "effDone": "Reviewed {result} by {who} on {date}",
+    "effFollow": "Follow-up NCR {number} created"
   },
   "verify": {
     "title": "Verify {number}",

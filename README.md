@@ -44,6 +44,14 @@ Every notification is queued twice: `IN_APP` (shown in the app) and `EMAIL`. A j
 
 `/admin` covers choice lists (relabel, add, hide — workflow-critical codes cannot be hidden), routing (department, person in charge and backup per process; when the PIC is marked away, triage assigns the backup automatically), the SLA table, holidays, people (create with a temporary password that must be changed at first sign-in, roles, department, away/email flags, deactivate, reset password) and a change-history view. Every setting change is written to `change_log` by trigger with the manager's name.
 
+## PDF of the form
+
+`GET /v1/ncr/:number/pdf` renders the record as F/QP/004-01 (V4) with headless Chromium via `playwright-core`; Part 3 appears for QA and auditors only. Set `CHROMIUM_PATH` to the browser binary (or run the API on a Playwright base image). The PDF is cached in storage per record version.
+
+## Effectiveness review
+
+On closure an effectiveness review is scheduled 90 working days out. A daily job (08:30) reminds QA 7 days before and once when overdue; reviews due within 7 days appear in QA's to-do. QA records Effective, Not effective or Not applicable on the NCR page; Not effective opens a follow-up NCR linked as a recurrence, assigned to the same PIC with fresh clocks. `POST /v1/admin/jobs/{effectiveness|sla|mail|digest}` runs any scheduled job on demand (QA manager).
+
 ## Checks
 
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` — the same four CI runs.

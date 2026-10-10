@@ -17,9 +17,10 @@ import { AttachmentsModule } from "./attachments/attachments.module";
 import { ReportsModule } from "./reports/reports.module";
 import { MailModule } from "./mail/mail.module";
 import { AdminModule } from "./admin/admin.module";
+import { PdfModule } from "./pdf/pdf.module";
 
 @Module({
-  imports: [ScheduleModule.forRoot(), PrismaModule, AuthModule, NotificationsModule, WorkflowModule, ComplaintsModule, NcrModule, AttachmentsModule, ReportsModule, MailModule, AdminModule],
+  imports: [ScheduleModule.forRoot(), PrismaModule, AuthModule, NotificationsModule, WorkflowModule, ComplaintsModule, NcrModule, AttachmentsModule, ReportsModule, MailModule, AdminModule, PdfModule],
   controllers: [HealthController, UsersController, LookupsController, TodoController],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

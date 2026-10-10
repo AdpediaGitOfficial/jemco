@@ -9,6 +9,7 @@ export type NcrDetail = {
   id: string; number: string; state: string; priority: string; respondBy: string | null; returnCount: number; triageNotes: string | null;
   containment: string | null; rootCause: string | null; rootCauseCategory: string | null; actionPlan: string | null; completedAt: string | null;
   dispositions: string[]; costOfNc: string | null; verificationResult: string | null; returnReason: string | null; qaJustification: string | null;
+  effectivenessDue: string | null; effectivenessResult: string | null; effectivenessNotes: string | null; effectivenessReviewedAt: string | null; effectivenessReviewedBy?: { name: string } | null;
   department: { name: string }; assignee: { id: string; name: string } | null;
   complaint: { number: string; type: string; source: string; process: string; customerName: string | null; supplierName: string | null; poDoNumber: string; quantity: string; quantityUnit: string; description: string; raisedAt: string; raisedBy: { name: string }; attachments?: Attachment[] } | null;
   attachments: Attachment[];

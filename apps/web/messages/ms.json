@@ -35,7 +35,8 @@
       "CONTINUE": "Teruskan",
       "REWORK": "Baiki dan hantar semula",
       "VERIFY": "Sahkan",
-      "WATCH": "Lihat"
+      "WATCH": "Lihat",
+      "REVIEW": "Semak keberkesanan"
     }
   },
   "priority": {
@@ -167,7 +168,18 @@
     "returned": "QA mengembalikan ini dengan nota:",
     "clock": "{days} hari bekerja lagi",
     "clockOver": "lewat {days} hari bekerja",
-    "evidence": "Bukti (gambar, laporan ujian, prosedur dikemas kini)"
+    "evidence": "Bukti (gambar, laporan ujian, prosedur dikemas kini)",
+    "pdf": "Muat turun borang (PDF)",
+    "effTitle": "Semakan keberkesanan",
+    "effHelp": "90 hari bekerja selepas ditutup: adakah tindakan pembetulan berkesan? Tidak berkesan membuka NCR susulan kepada PIC yang sama.",
+    "effDue": "Tarikh akhir {date}",
+    "EFFECTIVE": "Berkesan",
+    "NOT_EFFECTIVE": "Tidak berkesan",
+    "NOT_APPLICABLE": "Tidak berkenaan",
+    "effNotes": "Nota (apa yang disemak)",
+    "effSave": "Rekod semakan",
+    "effDone": "Disemak {result} oleh {who} pada {date}",
+    "effFollow": "NCR susulan {number} dibuat"
   },
   "verify": {
     "title": "Sahkan {number}",

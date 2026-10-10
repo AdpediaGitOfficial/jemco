@@ -161,6 +161,9 @@ model Ncr {
   verifiedAt     DateTime?  @map("verified_at")
   effectivenessDue DateTime? @map("effectiveness_due") @db.Date
   effectivenessResult String? @map("effectiveness_result")
+  effectivenessNotes String? @map("effectiveness_notes")
+  effectivenessReviewedAt DateTime? @map("effectiveness_reviewed_at")
+  effectivenessReviewedById String? @map("effectiveness_reviewed_by_id") @db.Uuid
 
   actions        Action[]
   clocks         SlaClock[]
