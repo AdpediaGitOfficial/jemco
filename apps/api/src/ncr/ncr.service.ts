@@ -73,7 +73,12 @@ export class NcrService {
       if (n.state === "ASSIGNED") { await this.sla.stop(tx, n.id, "RESPONSE"); await this.wf.transition(tx, n.id, "IN_PROGRESS", user); }
       if (n.state === "RETURNED") await this.wf.transition(tx, n.id, "IN_PROGRESS", user);
       await tx.ncr.update({ where: { id: n.id }, data: { containment: body.containment, rootCause: body.rootCause, rootCauseCategory: body.rootCauseCategory, actionPlan: body.actionPlan } });
-      // Action items: upsert given ids, mark the rest done=false but keep (never delete).
+      // Action items: upsert given ids; owners must be real, active users; ids must belong to this NCR.
+      const owners = new Set((await tx.user.findMany({ where: { id: { in: body.actions.map((a) => a.ownerId) }, active: true }, select: { id: true } })).map((u) => u.id));
+      const bad = body.actions.find((a) => !owners.has(a.ownerId));
+      if (bad) throw new BadRequestException({ message: "validation", fields: { "actions.ownerId": "unknown" } });
+      const own = new Set((await tx.action.findMany({ where: { ncrId: n.id }, select: { id: true } })).map((x) => x.id));
+      if (body.actions.some((a) => a.id && !own.has(a.id))) throw new BadRequestException({ message: "validation", fields: { "actions.id": "unknown" } });
       const keep: string[] = [];
       for (const a of body.actions) {
         const row = a.id

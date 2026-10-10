@@ -30,3 +30,15 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+      - name: API end-to-end (fresh database, mock identity provider)
+        run: pnpm --filter @jemco/api test:e2e
+        env: { TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jemco_test }
+      - name: Browser journey (Playwright, phone and desktop)
+        run: |
+          pnpm --filter @jemco/api db:seed
+          (cd apps/api && node dist/main.js > /tmp/api.log 2>&1 &)
+          (cd apps/web && pnpm exec next start -p 3000 > /tmp/web.log 2>&1 &)
+          pnpm --filter @jemco/web exec playwright install --with-deps chromium
+          for i in $(seq 1 30); do curl -sf localhost:4000/v1/health && break; sleep 1; done
+          pnpm --filter @jemco/web test:e2e
+        env: { WEB_ORIGIN: http://localhost:3000, API_PORT: "4000" }

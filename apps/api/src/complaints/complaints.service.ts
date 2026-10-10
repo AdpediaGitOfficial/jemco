@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import type { CreateComplaint, TriageDecision } from "@jemco/shared";
 import { PrismaService } from "../prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
@@ -79,7 +79,13 @@ export class ComplaintsService {
         await this.notify.notify(tx, [c.raisedById], "COMPLAINT_QUESTION", `QA has a question about ${number}`, d.question, `/complaints/${number}`);
         return { status: "NEED_MORE_INFO" };
       }
-      // ACCEPT
+      // ACCEPT: the department and assignee must exist, be active, and belong together
+      const department = await tx.department.findUnique({ where: { id: d.departmentId } });
+      if (!department) throw new BadRequestException({ message: "validation", fields: { departmentId: "unknown" } });
+      const assignee = await tx.user.findUnique({ where: { id: d.assigneeId }, include: { roles: true } });
+      if (!assignee || !assignee.active) throw new BadRequestException({ message: "validation", fields: { assigneeId: "unknown" } });
+      if (!assignee.roles.some((r) => ["PIC", "DEPT_MANAGER", "QA_COORDINATOR", "QA_MANAGER"].includes(r.role))) throw new BadRequestException({ message: "validation", fields: { assigneeId: "role" } });
+      if (assignee.departmentId !== d.departmentId && !assignee.roles.some((r) => ["QA_COORDINATOR", "QA_MANAGER"].includes(r.role))) throw new BadRequestException({ message: "validation", fields: { assigneeId: "department" } });
       // Away? Use the routing backup for that process when one exists.
       let assigneeId = d.assigneeId;
       const chosen = await tx.user.findUnique({ where: { id: assigneeId }, select: { outOfOffice: true } });

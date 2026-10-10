@@ -115,7 +115,7 @@
     "answer": "Jawapan anda",
     "send": "Hantar jawapan",
     "rejected": "QA tidak menerima laporan ini",
-    "ncr": "Dikendalikan sebagai NCR {number}"
+    "ncr": "Dikendalikan sebagai {number}"
   },
   "triage": {
     "title": "Semakan",

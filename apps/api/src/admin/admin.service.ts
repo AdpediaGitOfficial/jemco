@@ -27,6 +27,7 @@ export class AdminService {
     return this.db.asActor(actor.id, (tx) => tx.lookupOption.create({ data: { list, ...o, sortOrder: o.sortOrder ?? (max._max.sortOrder ?? 0) + 1 } }));
   }
   async patchLookup(actor: AuthUser, list: string, code: string, p: LookupPatch) {
+    if (!(await this.db.lookupOption.findUnique({ where: { list_code: { list, code } } }))) throw new NotFoundException();
     if (p.active === false && PROTECTED.has(`${list}:${code}`)) throw new BadRequestException({ message: "validation", fields: { active: "protected" } });
     return this.db.asActor(actor.id, (tx) => tx.lookupOption.update({ where: { list_code: { list, code } }, data: p }));
   }

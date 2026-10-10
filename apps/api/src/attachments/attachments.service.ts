@@ -37,10 +37,11 @@ export class AttachmentsService {
   }
 
   async stream(user: AuthUser, id: string) {
-    const a = await this.db.attachment.findUnique({ where: { id }, include: { complaint: { select: { raisedById: true } }, ncr: { select: { assigneeId: true, departmentId: true } } } });
+    const a = await this.db.attachment.findUnique({ where: { id }, include: { complaint: { select: { raisedById: true, ncr: { select: { assigneeId: true, departmentId: true } } } }, ncr: { select: { assigneeId: true, departmentId: true } } } });
     if (!a) throw new NotFoundException();
-    const allowed = isQA(user) || a.uploadedById === user.id || a.complaint?.raisedById === user.id || a.ncr?.assigneeId === user.id
-      || (user.roles.includes("DEPT_MANAGER") && a.ncr?.departmentId === user.departmentId);
+    const ncr = a.ncr ?? a.complaint?.ncr ?? null;
+    const allowed = isQA(user) || a.uploadedById === user.id || a.complaint?.raisedById === user.id || ncr?.assigneeId === user.id
+      || (user.roles.includes("DEPT_MANAGER") && ncr?.departmentId === user.departmentId);
     if (!allowed) throw new ForbiddenException();
     return { meta: a, body: await this.storage.get(a.storageKey) };
   }

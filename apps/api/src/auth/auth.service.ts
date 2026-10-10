@@ -48,6 +48,7 @@ export class AuthService {
   }
 
   async userForSession(sessionId: string): Promise<AuthUser | null> {
+    if (!/^[0-9a-f-]{36}$/i.test(sessionId)) return null;
     const s = await this.db.session.findUnique({ where: { id: sessionId }, include: { user: { include: { roles: true } } } });
     if (!s || s.expiresAt < new Date() || !s.user.active) return null;
     // slide the expiry on activity, at most once a minute

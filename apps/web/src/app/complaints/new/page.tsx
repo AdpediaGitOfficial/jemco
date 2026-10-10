@@ -17,18 +17,21 @@ const DRAFT_KEY = "jemco.newComplaint";
 export default function NewComplaintPage() {
   const t = useTranslations("new");
   const { data: lk } = useLookups(); const { label } = useLabel();
-  const [step, setStep] = useState(1);
-  const [v, setV] = useState<Partial<CreateComplaintInput>>(() => {
-    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "{}"); } catch { return {}; }
-  });
+  // The draft keeps the values, the step and the uploaded photos, so a dropped signal or a reload resumes where the person was.
+  const draft = (() => { try { return JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "{}"); } catch { return {}; } })() as { v?: Partial<CreateComplaintInput>; step?: number; photos?: Attachment[] };
+  const [step, setStepState] = useState(draft.step ?? 1);
+  const [v, setV] = useState<Partial<CreateComplaintInput>>(draft.v ?? {});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [doneNumber, setDoneNumber] = useState<string | null>(null);
-  const [photos, setPhotos] = useState<Attachment[]>([]);
-  const set = (patch: Partial<CreateComplaintInput>) => { const n = { ...v, ...patch }; setV(n); try { localStorage.setItem(DRAFT_KEY, JSON.stringify(n)); } catch {} };
+  const [photos, setPhotosState] = useState<Attachment[]>(draft.photos ?? []);
+  const save = (next: { v?: Partial<CreateComplaintInput>; step?: number; photos?: Attachment[] }) => { try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ v, step, photos, ...next })); } catch {} };
+  const set = (patch: Partial<CreateComplaintInput>) => { const n = { ...v, ...patch }; setV(n); save({ v: n }); };
+  const setStep = (n: number) => { setStepState(n); save({ step: n }); };
+  const setPhotos = (p: Attachment[]) => { setPhotosState(p); save({ photos: p }); };
 
   const send = useMutation({
     mutationFn: () => api<{ number: string }>("/complaints", { method: "POST", json: { ...v, quantity: Number(v.quantity), attachmentIds: photos.map((a) => a.id) } }),
-    onSuccess: (r) => { setDoneNumber(r.number); setPhotos([]); try { localStorage.removeItem(DRAFT_KEY); } catch {} },
+    onSuccess: (r) => { setDoneNumber(r.number); try { localStorage.removeItem(DRAFT_KEY); } catch {} setPhotosState([]); },
     onError: (e) => { if (e instanceof ApiError) setErrors(e.fields); },
   });
 
@@ -54,7 +57,7 @@ export default function NewComplaintPage() {
       <div className="text-ok text-5xl">✓</div>
       <h1 className="text-2xl font-bold">{t("done.title", { number: doneNumber })}</h1>
       <p className="text-grey-60">{t("done.body")}</p>
-      <div className="flex gap-3 justify-center"><button className="btn-secondary" onClick={() => { setDoneNumber(null); setV({}); setStep(1); }}>{t("done.another")}</button><Link href="/todo" className="btn-primary">{t("done.todo")}</Link></div>
+      <div className="flex gap-3 justify-center"><button className="btn-secondary" onClick={() => { setDoneNumber(null); setV({}); setPhotosState([]); setStepState(1); try { localStorage.removeItem(DRAFT_KEY); } catch {} }}>{t("done.another")}</button><Link href="/todo" className="btn-primary">{t("done.todo")}</Link></div>
     </div></AppShell>
   );
 

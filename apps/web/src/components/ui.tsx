@@ -1,4 +1,5 @@
 "use client";
+import { cloneElement, isValidElement, useId } from "react";
 import { useTranslations } from "next-intl";
 import type { Lookup } from "@/lib/api";
 import { useLabel } from "@/lib/hooks";
@@ -55,11 +56,16 @@ export function ChoiceCards({ options, value, onChange, columns = 2 }: { options
   );
 }
 
+/** Associates the label with a native control automatically (htmlFor/id), so screen readers and tests can find it. */
 export function Field({ label, error, help, children }: { label: string; error?: string; help?: string; children: React.ReactNode }) {
+  const generated = useId();
+  const native = isValidElement(children) && typeof children.type === "string" && ["input", "select", "textarea"].includes(children.type);
+  const id = native ? ((children as React.ReactElement<{ id?: string }>).props.id ?? generated) : undefined;
+  const control = native ? cloneElement(children as React.ReactElement<{ id?: string }>, { id }) : children;
   return (
     <div>
-      <label className="label">{label}</label>
-      {children}
+      <label className="label" htmlFor={id}>{label}</label>
+      {control}
       {help && !error && <div className="help mt-1">{help}</div>}
       {error && <div className="error">{error}</div>}
     </div>

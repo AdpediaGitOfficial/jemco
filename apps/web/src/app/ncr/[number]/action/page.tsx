@@ -36,7 +36,12 @@ export default function ActionPage({ params }: { params: Promise<{ number: strin
   const payload = () => ({ containment: f.containment || undefined, rootCause: f.rootCause || undefined, rootCauseCategory: f.rootCauseCategory || undefined, actionPlan: f.actionPlan || undefined, actions: items.filter((i) => i.description.trim()) });
   const save = useMutation({
     mutationFn: () => api<NcrDetail>(`/ncr/${number}/action`, { method: "POST", json: payload() }),
-    onSuccess: (r) => { setMsg(t("saved")); setErr(""); setItems(r.actions.map((a) => ({ id: a.id, description: a.description, ownerId: a.ownerId, dueDate: a.dueDate.slice(0, 10), done: a.done }))); qc.setQueryData(["ncr", number], r); setTimeout(() => setMsg(""), 2000); },
+    onSuccess: (r) => {
+      setMsg(t("saved")); setErr("");
+      // Take ids from the server, but keep rows the person is still typing (no text yet, so never sent).
+      setItems((prev) => [...r.actions.map((a) => ({ id: a.id, description: a.description, ownerId: a.ownerId, dueDate: a.dueDate.slice(0, 10), done: a.done })), ...prev.filter((i) => !i.id && !i.description.trim())]);
+      qc.setQueryData(["ncr", number], r); setTimeout(() => setMsg(""), 2000);
+    },
     onError: (e) => setErr(e instanceof ApiError ? Object.values(e.fields).join(", ") || e.message : String(e)),
   });
   const submit = useMutation({

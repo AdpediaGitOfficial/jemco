@@ -115,7 +115,7 @@
     "answer": "Your answer",
     "send": "Send answer",
     "rejected": "QA did not accept this report",
-    "ncr": "Handled as NCR {number}"
+    "ncr": "Handled as {number}"
   },
   "triage": {
     "title": "Triage",

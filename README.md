@@ -66,7 +66,10 @@ Set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` and `OIDC_REDIRECT_URI
 
 ## Checks
 
-`pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` — the same four CI runs.
+`pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` — the same four CI runs. Two end-to-end suites also run in CI:
+
+- `pnpm --filter @jemco/api test:e2e` — black-box API tests against a throwaway database (`TEST_DATABASE_URL`, name must contain `test`): auth and lockout, SSO against a mock OpenID provider, intake validation, triage, the whole NCR lifecycle with returns and escalation, attachments and access rules, reports and scoping, admin, scheduled jobs, the database triggers and working-day functions, and the PDF when `CHROMIUM_PATH` is set.
+- `pnpm --filter @jemco/web test:e2e` — Playwright drives the real screens on a phone and a desktop viewport through one complaint from report to closure, plus the forced password change and sign-in errors. Start the API and web first (`pnpm dev`) and set `CHROMIUM_PATH` if the Playwright browsers are not installed.
 
 ## How a record moves
 
