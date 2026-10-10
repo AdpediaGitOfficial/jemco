@@ -1,0 +1,44 @@
+{
+  "app": { "name": "JEMCO NCR", "signOut": "Log keluar", "language": "English" },
+  "nav": { "todo": "Tugasan anda", "new": "Laporkan masalah", "complaints": "Laporan saya", "triage": "Semakan", "verify": "Sahkan", "ncrs": "NCR" },
+  "login": { "title": "Log masuk", "email": "E-mel kerja", "password": "Kata laluan", "button": "Log masuk", "failed": "E-mel atau kata laluan salah" },
+  "todo": {
+    "title": "Tugasan anda", "empty": "Tiada tugasan menunggu. Syabas.", "due": "Tarikh akhir {date}", "overdue": "Lewat sejak {date}",
+    "action": { "ANSWER": "Jawab QA", "TRIAGE": "Semak", "START": "Mula", "CONTINUE": "Teruskan", "REWORK": "Baiki dan hantar semula", "VERIFY": "Sahkan", "WATCH": "Lihat" }
+  },
+  "priority": { "LOW": "Rendah", "MEDIUM": "Sederhana", "HIGH": "Tinggi", "URGENT": "Segera" },
+  "status": {
+    "SUBMITTED": "Menunggu QA", "NEED_MORE_INFO": "QA ada soalan", "REJECTED": "Tidak diterima", "ACCEPTED": "Diterima",
+    "ASSIGNED": "Ditugaskan", "IN_PROGRESS": "Dalam tindakan", "AWAITING_VERIFICATION": "Menunggu pengesahan QA", "RETURNED": "Dikembalikan untuk tindakan lanjut", "CLOSED": "Ditutup"
+  },
+  "new": {
+    "title": "Laporkan masalah", "step": "Langkah {n} daripada {total}", "back": "Kembali", "next": "Seterusnya", "send": "Hantar kepada QA",
+    "s1": { "title": "Masalah jenis apa?" },
+    "s2": { "title": "Di mana ia berlaku?", "process": "Proses mana?", "source": "Siapa yang menemuinya?", "other": "Sila nyatakan" },
+    "s3": { "title": "Siapa yang terlibat?", "customer": "Nama pelanggan", "supplier": "Nama pembekal", "po": "Nombor PO atau DO", "delivery": "Tarikh penghantaran (jika tahu)", "cef": "Nombor CEF (jika ada)", "qty": "Kuantiti terjejas", "unit": "Unit" },
+    "s4": { "title": "Sejauh mana segera?" },
+    "s5": { "title": "Ceritakan apa yang berlaku", "help": "Tulis sekurang-kurangnya beberapa ayat. Apa yang dijangka, apa yang ditemui, dan di mana ia sekarang.", "placeholder": "Contoh: Pelanggan menerima 20 braket dengan salutan serbuk terkelupas di tepi…", "min": "Sila tulis sekurang-kurangnya 50 aksara ({n} setakat ini)" },
+    "s6": { "title": "Semak dan hantar", "edit": "Ubah" },
+    "done": { "title": "Dihantar. Nombor anda ialah {number}", "body": "QA akan menyemaknya dan anda akan dimaklumkan. Simpan nombor ini untuk rujukan.", "another": "Laporkan lagi", "todo": "Kembali ke tugasan" }
+  },
+  "complaint": { "title": "Laporan {number}", "question": "QA bertanya:", "answer": "Jawapan anda", "send": "Hantar jawapan", "rejected": "QA tidak menerima laporan ini", "ncr": "Dikendalikan sebagai NCR {number}" },
+  "triage": {
+    "title": "Semakan", "queue": "Menunggu semakan", "empty": "Tiada laporan menunggu.",
+    "decision": "Keputusan anda", "accept": "Terima dan tugaskan", "reject": "Tidak diterima", "ask": "Tanya pelapor",
+    "priority": "Sahkan keutamaan", "priorityReason": "Mengapa ubah keutamaan?", "department": "Jabatan", "assignee": "Pegawai bertanggungjawab", "notes": "Nota untuk PIC (pilihan)",
+    "reason": "Sebab", "reasonText": "Jelaskan kepada pelapor", "question": "Soalan anda", "submit": "Sahkan",
+    "rejectReason": { "DUPLICATE": "Sama dengan laporan lain", "NOT_NC": "Bukan ketidakpatuhan", "INSUFFICIENT_INFO": "Maklumat tidak mencukupi", "OUT_OF_SCOPE": "Di luar skop", "OTHER": "Lain-lain" }
+  },
+  "ncr": {
+    "title": "NCR {number}", "issue": "Isu", "action": "Tindakan anda", "verification": "Pengesahan QA", "history": "Sejarah",
+    "containment": "Apa yang anda lakukan serta-merta untuk mengelakkan ia menjadi lebih teruk?", "rootCause": "Mengapa ia berlaku? (punca)", "rootCauseHelp": "Tanya \"mengapa?\" sehingga lima kali, setiap kali tentang jawapan sebelumnya.", "rootCauseCategory": "Kategori punca",
+    "plan": "Apa yang akan anda lakukan supaya ia tidak berulang?", "actions": "Item tindakan", "addAction": "Tambah item tindakan", "actionDesc": "Apa yang akan dibuat", "actionOwner": "Siapa", "actionDue": "Bila", "actionDone": "Selesai",
+    "save": "Simpan", "submit": "Hantar kepada QA untuk pengesahan", "saved": "Disimpan", "incomplete": "Sebelum boleh hantar: {items}",
+    "missing": { "rootCause": "tulis punca", "actionPlan": "tulis pelan tindakan", "actions": "tambah sekurang-kurangnya satu item tindakan", "actionsDone": "tandakan setiap item tindakan sebagai selesai" },
+    "returned": "QA mengembalikan ini dengan nota:", "clock": "{days} hari bekerja lagi", "clockOver": "lewat {days} hari bekerja"
+  },
+  "verify": {
+    "title": "Sahkan {number}", "queue": "Menunggu pengesahan", "empty": "Tiada untuk disahkan.",
+    "result": "Keputusan", "ok": "Memuaskan: tutup", "no": "Tidak memuaskan: kembalikan", "dispositions": "Pelupusan lot", "cost": "Kos ketidakpatuhan (RM)", "justification": "Justifikasi QA", "returnReason": "Apa yang PIC perlu buat berbeza?", "submit": "Sahkan"
+  }
+}

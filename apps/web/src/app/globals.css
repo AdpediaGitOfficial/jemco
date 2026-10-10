@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* JEMCO brand tokens, measured from the logo. Status red is deliberately a different red. */
+@theme {
+  --color-brand: #cd1918;
+  --color-brand-dark: #a01010;
+  --color-charcoal: #474749;
+  --color-ink: #1f1f23;
+  --color-grey-60: #6b6b70;
+  --color-grey-20: #e6e6e9;
+  --color-surface: #f7f7f8;
+  --color-ok: #1e8e3e;
+  --color-warn: #c77700;
+  --color-bad: #b3261e;
+  --color-muted: #8a8a8f;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+html { font-size: 16px; }
+body { background: var(--color-surface); color: var(--color-ink); font-family: var(--font-sans); }
+
+/* 48px tap targets everywhere a layman taps. */
+@utility btn { @apply inline-flex items-center justify-center min-h-12 px-5 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed; }
+.btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark; }
+.btn-secondary { @apply btn bg-white text-ink border border-grey-20 hover:bg-surface; }
+.btn-ghost { @apply btn text-grey-60 hover:text-ink; }
+.card { @apply bg-white rounded-2xl border border-grey-20 p-5; }
+.input { @apply w-full min-h-12 rounded-xl border border-grey-20 bg-white px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand/40; }
+.label { @apply block text-sm font-semibold text-charcoal mb-1.5; }
+.help { @apply text-sm text-grey-60; }
+.error { @apply text-sm text-bad mt-1; }

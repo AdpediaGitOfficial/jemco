@@ -1,0 +1,40 @@
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import argon2 from "argon2";
+import { PrismaService } from "../prisma/prisma.service";
+import type { AuthUser } from "../common/decorators";
+
+const SESSION_HOURS = 12;
+
+@Injectable()
+export class AuthService {
+  constructor(private db: PrismaService) {}
+
+  async login(email: string, password: string): Promise<{ sessionId: string; user: AuthUser }> {
+    const u = await this.db.user.findUnique({ where: { email: email.toLowerCase() }, include: { roles: true } });
+    if (!u || !u.active || !(await argon2.verify(u.passwordHash, password))) {
+      throw new UnauthorizedException("wrong email or password");
+    }
+    const s = await this.db.session.create({
+      data: { userId: u.id, expiresAt: new Date(Date.now() + SESSION_HOURS * 3600_000) },
+    });
+    return { sessionId: s.id, user: this.toAuthUser(u) };
+  }
+
+  async logout(sessionId: string) {
+    await this.db.session.deleteMany({ where: { id: sessionId } });
+  }
+
+  async userForSession(sessionId: string): Promise<AuthUser | null> {
+    const s = await this.db.session.findUnique({ where: { id: sessionId }, include: { user: { include: { roles: true } } } });
+    if (!s || s.expiresAt < new Date() || !s.user.active) return null;
+    // slide the expiry on activity, at most once a minute
+    if (s.expiresAt.getTime() - Date.now() < (SESSION_HOURS * 3600_000 - 60_000)) {
+      await this.db.session.update({ where: { id: s.id }, data: { expiresAt: new Date(Date.now() + SESSION_HOURS * 3600_000) } });
+    }
+    return this.toAuthUser(s.user);
+  }
+
+  private toAuthUser(u: { id: string; email: string; name: string; locale: string; departmentId: string | null; roles: { role: string }[] }): AuthUser {
+    return { id: u.id, email: u.email, name: u.name, locale: u.locale, departmentId: u.departmentId, roles: u.roles.map((r) => r.role) };
+  }
+}

@@ -1,0 +1,342 @@
+// JEMCO Complaint & NCR System — data model.
+// Three record types (Complaint, Ncr, Action) plus workflow, time, people,
+// configuration, communication and audit tables. See docs/ for the spec.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- People ----------
+
+model Department {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  name      String
+  users     User[]
+  routing   RoutingMap[]
+  ncrs      Ncr[]
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("departments")
+}
+
+model User {
+  id           String      @id @default(uuid()) @db.Uuid
+  email        String      @unique
+  name         String
+  passwordHash String      @map("password_hash")
+  locale       String      @default("en")
+  active       Boolean     @default(true)
+  outOfOffice  Boolean     @default(false) @map("out_of_office")
+  departmentId String?     @map("department_id") @db.Uuid
+  department   Department? @relation(fields: [departmentId], references: [id])
+  roles        UserRole[]
+  sessions     Session[]
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  raisedComplaints  Complaint[] @relation("raisedBy")
+  triagedComplaints Complaint[] @relation("triagedBy")
+  assignedNcrs      Ncr[]       @relation("assignee")
+  verifiedNcrs      Ncr[]       @relation("verifiedBy")
+  actions           Action[]
+  transitions       TransitionLog[]
+  changes           ChangeLog[]
+  primaryFor        RoutingMap[] @relation("primaryPic")
+  backupFor         RoutingMap[] @relation("backupPic")
+
+  @@map("users")
+}
+
+model UserRole {
+  userId String @map("user_id") @db.Uuid
+  role   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, role])
+  @@map("user_roles")
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+/// Process code -> department, primary and backup PIC.
+model RoutingMap {
+  process      String     @id
+  departmentId String     @map("department_id") @db.Uuid
+  department   Department @relation(fields: [departmentId], references: [id])
+  primaryPicId String?    @map("primary_pic_id") @db.Uuid
+  primaryPic   User?      @relation("primaryPic", fields: [primaryPicId], references: [id])
+  backupPicId  String?    @map("backup_pic_id") @db.Uuid
+  backupPic    User?      @relation("backupPic", fields: [backupPicId], references: [id])
+
+  @@map("routing_map")
+}
+
+// ---------- Records ----------
+
+model Complaint {
+  id            String    @id @default(uuid()) @db.Uuid
+  number        String    @unique // CMP-YYYY-NNNN
+  type          String
+  source        String
+  sourceOther   String?   @map("source_other")
+  process       String
+  processOther  String?   @map("process_other")
+  priority      String    // issuer's priority; QA confirms on the NCR
+  customerName  String?   @map("customer_name")
+  supplierName  String?   @map("supplier_name")
+  poDoNumber    String    @map("po_do_number")
+  deliveryDate  DateTime? @map("delivery_date") @db.Date
+  cefNumber     String?   @map("cef_number")
+  quantity      Decimal   @db.Decimal(14, 3)
+  quantityUnit  String    @map("quantity_unit")
+  description   String
+  status        String    @default("SUBMITTED") // SUBMITTED | NEED_MORE_INFO | REJECTED | ACCEPTED
+  raisedById    String    @map("raised_by_id") @db.Uuid
+  raisedBy      User      @relation("raisedBy", fields: [raisedById], references: [id])
+  raisedAt      DateTime  @default(now()) @map("raised_at")
+  triagedById   String?   @map("triaged_by_id") @db.Uuid
+  triagedBy     User?     @relation("triagedBy", fields: [triagedById], references: [id])
+  triagedAt     DateTime? @map("triaged_at")
+  rejectionReason     String?    @map("rejection_reason")
+  rejectionText       String?    @map("rejection_text")
+  duplicateOfId       String?    @map("duplicate_of_id") @db.Uuid
+  infoQuestion        String?    @map("info_question")
+  infoAnswer          String?    @map("info_answer")
+  ncr           Ncr?
+  attachments   Attachment[]
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([raisedById])
+  @@map("complaints")
+}
+
+model Ncr {
+  id             String     @id @default(uuid()) @db.Uuid
+  number         String     @unique // NCR-YYYY-NNNN
+  complaintId    String?    @unique @map("complaint_id") @db.Uuid
+  complaint      Complaint? @relation(fields: [complaintId], references: [id])
+  state          String     @default("ASSIGNED")
+  priority       String
+  departmentId   String     @map("department_id") @db.Uuid
+  department     Department @relation(fields: [departmentId], references: [id])
+  assigneeId     String?    @map("assignee_id") @db.Uuid
+  assignee       User?      @relation("assignee", fields: [assigneeId], references: [id])
+  respondBy      DateTime?  @map("respond_by") @db.Date
+  returnCount    Int        @default(0) @map("return_count")
+  triageNotes    String?    @map("triage_notes")
+
+  // Part 2B
+  containment    String?
+  rootCause      String?    @map("root_cause")
+  rootCauseCategory String? @map("root_cause_category")
+  actionPlan     String?    @map("action_plan")
+  completedAt    DateTime?  @map("completed_at")
+
+  // Part 3
+  dispositions   String[]   @default([])
+  dispositionNote String?   @map("disposition_note")
+  costOfNc       Decimal?   @map("cost_of_nc") @db.Decimal(14, 2)
+  verificationResult String? @map("verification_result")
+  returnReason   String?    @map("return_reason")
+  qaJustification String?   @map("qa_justification")
+  verifiedById   String?    @map("verified_by_id") @db.Uuid
+  verifiedBy     User?      @relation("verifiedBy", fields: [verifiedById], references: [id])
+  verifiedAt     DateTime?  @map("verified_at")
+  effectivenessDue DateTime? @map("effectiveness_due") @db.Date
+  effectivenessResult String? @map("effectiveness_result")
+
+  actions        Action[]
+  clocks         SlaClock[]
+  attachments    Attachment[]
+  transitions    TransitionLog[]
+  linksFrom      NcrLink[]  @relation("linkFrom")
+  linksTo        NcrLink[]  @relation("linkTo")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  @@index([state])
+  @@index([assigneeId])
+  @@index([departmentId])
+  @@map("ncrs")
+}
+
+model Action {
+  id          String    @id @default(uuid()) @db.Uuid
+  ncrId       String    @map("ncr_id") @db.Uuid
+  ncr         Ncr       @relation(fields: [ncrId], references: [id])
+  description String
+  ownerId     String    @map("owner_id") @db.Uuid
+  owner       User      @relation(fields: [ownerId], references: [id])
+  dueDate     DateTime  @map("due_date") @db.Date
+  done        Boolean   @default(false)
+  doneAt      DateTime? @map("done_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([ncrId])
+  @@map("actions")
+}
+
+model Attachment {
+  id          String     @id @default(uuid()) @db.Uuid
+  complaintId String?    @map("complaint_id") @db.Uuid
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+  ncrId       String?    @map("ncr_id") @db.Uuid
+  ncr         Ncr?       @relation(fields: [ncrId], references: [id])
+  fileName    String     @map("file_name")
+  mimeType    String     @map("mime_type")
+  sizeBytes   Int        @map("size_bytes")
+  storageKey  String     @map("storage_key")
+  uploadedById String    @map("uploaded_by_id") @db.Uuid
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  @@map("attachments")
+}
+
+model NcrLink {
+  fromId String @map("from_id") @db.Uuid
+  toId   String @map("to_id") @db.Uuid
+  kind   String // RELATED | RECURRENCE_OF
+  from   Ncr    @relation("linkFrom", fields: [fromId], references: [id])
+  to     Ncr    @relation("linkTo", fields: [toId], references: [id])
+
+  @@id([fromId, toId])
+  @@map("ncr_links")
+}
+
+// ---------- Workflow ----------
+
+/// Allowed transitions, as data. The API checks this table; a DB trigger enforces it too.
+model StateTransition {
+  fromState      String  @map("from_state")
+  toState        String  @map("to_state")
+  roles          String[] // roles allowed to trigger
+  reasonRequired Boolean @default(false) @map("reason_required")
+
+  @@id([fromState, toState])
+  @@map("state_transitions")
+}
+
+model TransitionLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  ncrId     String   @map("ncr_id") @db.Uuid
+  ncr       Ncr      @relation(fields: [ncrId], references: [id])
+  fromState String?  @map("from_state")
+  toState   String   @map("to_state")
+  actorId   String   @map("actor_id") @db.Uuid
+  actor     User     @relation(fields: [actorId], references: [id])
+  reason    String?
+  at        DateTime @default(now())
+
+  @@index([ncrId])
+  @@map("transition_log")
+}
+
+// ---------- Time ----------
+
+model SlaPolicy {
+  priority           String @id
+  triageDays         Int    @map("triage_days")
+  responseDays       Int    @map("response_days")
+  resolutionDays     Int    @map("resolution_days")
+  verificationDays   Int    @map("verification_days")
+
+  @@map("sla_policies")
+}
+
+model SlaClock {
+  id         String    @id @default(uuid()) @db.Uuid
+  ncrId      String    @map("ncr_id") @db.Uuid
+  ncr        Ncr       @relation(fields: [ncrId], references: [id])
+  kind       String
+  startedAt  DateTime  @map("started_at")
+  dueAt      DateTime  @map("due_at")
+  stoppedAt  DateTime? @map("stopped_at")
+  breachedAt DateTime? @map("breached_at")
+  alert50At  DateTime? @map("alert50_at")
+  alert80At  DateTime? @map("alert80_at")
+
+  @@index([ncrId])
+  @@index([dueAt])
+  @@map("sla_clocks")
+}
+
+model WorkingCalendar {
+  date   DateTime @id @db.Date
+  reason String
+
+  @@map("working_calendar")
+}
+
+// ---------- Configuration ----------
+
+model LookupOption {
+  list      String
+  code      String
+  labelEn   String  @map("label_en")
+  labelMs   String  @map("label_ms")
+  helpEn    String? @map("help_en")
+  helpMs    String? @map("help_ms")
+  sortOrder Int     @map("sort_order")
+  active    Boolean @default(true)
+
+  @@id([list, code])
+  @@map("lookup_options")
+}
+
+model Sequence {
+  key   String @id // e.g. CMP-2026, NCR-2026
+  value Int    @default(0)
+
+  @@map("sequences")
+}
+
+// ---------- Communication ----------
+
+model Notification {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  event       String
+  subject     String
+  body        String
+  link        String?
+  channel     String    @default("IN_APP") // IN_APP | EMAIL | WHATSAPP
+  readAt      DateTime? @map("read_at")
+  sentAt      DateTime? @map("sent_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+// ---------- Audit ----------
+
+/// Append-only; written by a database trigger, never by the application.
+model ChangeLog {
+  id        BigInt   @id @default(autoincrement())
+  tableName String   @map("table_name")
+  rowId     String   @map("row_id")
+  field     String
+  oldValue  String?  @map("old_value")
+  newValue  String?  @map("new_value")
+  actorId   String?  @map("actor_id") @db.Uuid
+  actor     User?    @relation(fields: [actorId], references: [id])
+  at        DateTime @default(now())
+
+  @@index([tableName, rowId])
+  @@map("change_log")
+}
