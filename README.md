@@ -52,9 +52,9 @@ Every notification is queued twice: `IN_APP` (shown in the app) and `EMAIL`. A j
 
 On closure an effectiveness review is scheduled 90 working days out. A daily job (08:30) reminds QA 7 days before and once when overdue; reviews due within 7 days appear in QA's to-do. QA records Effective, Not effective or Not applicable on the NCR page; Not effective opens a follow-up NCR linked as a recurrence, assigned to the same PIC with fresh clocks. `POST /v1/admin/jobs/{effectiveness|sla|mail|digest}` runs any scheduled job on demand (QA manager).
 
-## Single sign-on
+## Sign-in
 
-Set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` and `OIDC_REDIRECT_URI` (see `.env.example`; Google Workspace and Microsoft 365 values are given there) and the login page shows a "Sign in with …" button. Sign-in is authorization code + PKCE with ID-token verification. `OIDC_ALLOWED_DOMAINS` restricts which email domains may sign in; with `OIDC_AUTO_PROVISION=true` a first sign-in from an allowed domain creates an Issuer account (the QA manager raises roles in Admin). Password sign-in stays available for accounts created in Admin.
+Sign-in is by work email and password only; there is no Google or Microsoft single sign-on. The QA manager creates accounts in Admin → People, which issues a temporary password that must be changed on first sign-in. Roles are a property of the account, so the login screen never asks who you are or what you do. Ten failed attempts lock an account for 15 minutes.
 
 ## Supplier and customer scorecards
 
@@ -68,7 +68,7 @@ Set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` and `OIDC_REDIRECT_URI
 
 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` — the same four CI runs. Two end-to-end suites also run in CI:
 
-- `pnpm --filter @jemco/api test:e2e` — black-box API tests against a throwaway database (`TEST_DATABASE_URL`, name must contain `test`): auth and lockout, SSO against a mock OpenID provider, intake validation, triage, the whole NCR lifecycle with returns and escalation, attachments and access rules, reports and scoping, admin, scheduled jobs, the database triggers and working-day functions, and the PDF when `CHROMIUM_PATH` is set.
+- `pnpm --filter @jemco/api test:e2e` — black-box API tests against a throwaway database (`TEST_DATABASE_URL`, name must contain `test`): auth and lockout, intake validation, triage, the whole NCR lifecycle with returns and escalation, attachments and access rules, reports and scoping, admin, scheduled jobs, the database triggers and working-day functions, and the PDF when `CHROMIUM_PATH` is set.
 - `pnpm --filter @jemco/web test:e2e` — Playwright drives the real screens on a phone and a desktop viewport through one complaint from report to closure, plus the forced password change and sign-in errors. Start the API and web first (`pnpm dev`) and set `CHROMIUM_PATH` if the Playwright browsers are not installed.
 
 ## How a record moves

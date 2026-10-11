@@ -22,10 +22,7 @@
     "email": "E-mel kerja",
     "password": "Kata laluan",
     "button": "Log masuk",
-    "failed": "E-mel atau kata laluan salah",
-    "sso": "Log masuk dengan {label}",
-    "or": "atau dengan kata laluan",
-    "ssoError": "Log masuk tunggal gagal: {msg}"
+    "failed": "E-mel atau kata laluan salah"
   },
   "todo": {
     "title": "Tugasan anda",

@@ -22,10 +22,7 @@
     "email": "Work email",
     "password": "Password",
     "button": "Sign in",
-    "failed": "Wrong email or password",
-    "sso": "Sign in with {label}",
-    "or": "or with your password",
-    "ssoError": "Single sign-on failed: {msg}"
+    "failed": "Wrong email or password"
   },
   "todo": {
     "title": "Your to-do",

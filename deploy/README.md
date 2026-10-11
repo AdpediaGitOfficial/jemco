@@ -8,7 +8,7 @@ Option B from the technology plan: one VPS (4 vCPU, 8 GB, Ubuntu 24.04), Docker,
 # on the server
 sudo apt-get update && sudo apt-get install -y docker.io docker-compose-v2 git
 git clone https://github.com/AdpediaGitOfficial/jemco.git && cd jemco/deploy
-cp .env.example .env && nano .env            # DOMAIN, DB_PASSWORD, mail, optional S3 and SSO
+cp .env.example .env && nano .env            # DOMAIN, DB_PASSWORD, mail, optional S3
 docker compose pull                          # or: docker compose build
 docker compose up -d                         # API runs migrations on start
 docker compose exec api npx tsx prisma/seed.ts   # lookups, SLA table, departments, demo sign-ins
