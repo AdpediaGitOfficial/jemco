@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh flex flex-col">
       <header className="bg-white border-b border-grey-20">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center gap-4">
-          <Link href="/todo" className="flex items-center gap-2 shrink-0"><Image src="/logo.png" alt="JEMCO" width={110} height={34} priority /></Link>
+          <Link href="/todo" className="flex items-center gap-2 shrink-0"><Image src="/jemco-logo.webp" alt="JEMCO" width={110} height={34} priority /></Link>
           <nav className="hidden md:flex gap-1 ml-4">
             {links.map((l) => (
               <Link key={l.href} href={l.href} className={`px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${path.startsWith(l.href) ? "bg-surface text-ink" : "text-grey-60 hover:text-ink"}`}>{l.label}</Link>
