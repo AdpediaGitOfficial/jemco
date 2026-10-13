@@ -179,3 +179,60 @@ test.describe.serial("one complaint, end to end, through the real screens", () =
     await page.waitForURL("**/login**");
   });
 });
+
+test.describe("navigation and header", () => {
+  const SHORT: Record<string, RegExp> = { "Your to-do": /^to-do$/i, "Report a problem": /^report$/i, "My reports": /^reports$/i, Triage: /^triage$/i };
+
+  test("QA manager: every destination is reachable, the active page is marked, avatar and sign out work", async ({ page }, info) => {
+    const phone = info.project.name === "phone";
+    await signIn(page, "qa.manager@jemco.local");
+    const nav = page.getByRole("navigation", { name: /main navigation/i });          // only one is visible at a time
+    for (const name of ["Your to-do", "Report a problem", "My reports", "Triage"]) await expect(nav.getByRole("link", { name: phone ? SHORT[name]! : name })).toBeVisible();
+    await expect(nav.getByRole("link", { name: phone ? /^to-do$/i : "Your to-do" })).toHaveAttribute("aria-current", "page");
+
+    if (phone) {                                                                      // the rest sit under More on a phone
+      await nav.getByRole("button", { name: /more/i }).click();
+      const menu = page.getByRole("dialog", { name: /more/i });
+      for (const name of ["Verify", "NCRs", "Dashboard", "Register", "Suppliers & customers", "Admin"]) await expect(menu.getByRole("link", { name })).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(menu).toBeHidden();
+      await nav.getByRole("button", { name: /more/i }).click();
+      await page.getByRole("dialog", { name: /more/i }).getByRole("link", { name: "Dashboard" }).click();
+      await expect(page.getByRole("dialog")).toBeHidden();                            // closes after navigating
+    } else {                                                                          // the desktop sidebar lists everything, grouped
+      for (const name of ["Verify", "NCRs", "Dashboard", "Register", "Suppliers & customers", "Admin"]) await expect(nav.getByRole("link", { name })).toBeVisible();
+      await expect(nav.getByText(/^insights$/i)).toBeVisible();
+      await nav.getByRole("link", { name: "Dashboard" }).click();
+    }
+    await page.waitForURL("**/dashboard");
+    await expect(page.getByRole("heading", { name: /^dashboard$/i })).toBeVisible();
+
+    await page.getByRole("link", { name: /signed in as qa manager/i }).click();      // avatar goes to the account page
+    await page.waitForURL("**/account");
+    const out = page.getByRole("button", { name: /^sign out$/i });
+    await expect(out).toBeInViewport();                                               // used to be pushed off the desktop header
+    await out.click();
+    await page.waitForURL("**/login");
+  });
+
+  test("an issuer sees only the tabs they can use, and Report is not highlighted on My reports", async ({ page }, info) => {
+    const phone = info.project.name === "phone";
+    await signIn(page, "sales@jemco.local");
+    const nav = page.getByRole("navigation", { name: /main navigation/i });
+    await expect(nav.getByRole("button", { name: /more/i })).toHaveCount(0);
+    await expect(nav.getByRole("link", { name: /triage/i })).toHaveCount(0);
+    const reports = nav.getByRole("link", { name: phone ? SHORT["My reports"]! : "My reports" });
+    await reports.click();
+    await page.waitForURL("**/complaints");
+    await expect(reports).toHaveAttribute("aria-current", "page");
+    await expect(nav.getByRole("link", { name: phone ? SHORT["Report a problem"]! : "Report a problem" })).not.toHaveAttribute("aria-current", "page");
+  });
+
+  test("report a problem: progress bar is announced and Back on the first step returns to the to-do", async ({ page }) => {
+    await signIn(page, "sales@jemco.local");
+    await page.goto("/complaints/new");
+    await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1");
+    await page.getByRole("button", { name: /^back$/i }).click();
+    await page.waitForURL("**/todo");
+  });
+});

@@ -1,23 +1,28 @@
 "use client";
 import { cloneElement, isValidElement, useId } from "react";
+import { Icon, type IconName } from "@/components/icons";
 import { useTranslations } from "next-intl";
 import type { Lookup } from "@/lib/api";
 import { useLabel } from "@/lib/hooks";
 
-/** Colour plus words, always. */
+const TONE = { success: "bg-ok-bg text-ok", warning: "bg-warn-bg text-warn", danger: "bg-bad-bg text-bad", info: "bg-info-bg text-info", neutral: "bg-[#eff0f3] text-grey-60" } as const;
+
+/** Colour plus words, always: a tinted pill with a dot and the status name. */
 export function StatusChip({ status }: { status: string }) {
   const t = useTranslations("status");
-  const tone: Record<string, string> = {
-    CLOSED: "bg-grey-20 text-grey-60", REJECTED: "bg-grey-20 text-grey-60",
-    RETURNED: "bg-bad/10 text-bad", NEED_MORE_INFO: "bg-warn/10 text-warn", AWAITING_VERIFICATION: "bg-warn/10 text-warn",
+  const tone: Record<string, keyof typeof TONE> = {
+    CLOSED: "success", ACCEPTED: "success", REJECTED: "neutral",
+    RETURNED: "danger", NEED_MORE_INFO: "danger",
+    SUBMITTED: "warning", AWAITING_VERIFICATION: "warning",
+    ASSIGNED: "info", IN_PROGRESS: "info",
   };
-  return <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${tone[status] ?? "bg-ok/10 text-ok"}`}>{t.has(status) ? t(status) : status}</span>;
+  return <span className={`badge ${TONE[tone[status] ?? "neutral"]}`}>{t.has(status) ? t(status) : status}</span>;
 }
 
 export function PriorityChip({ priority }: { priority: string }) {
   const t = useTranslations("priority");
-  const tone: Record<string, string> = { URGENT: "bg-bad text-white", HIGH: "bg-warn text-white", MEDIUM: "bg-charcoal text-white", LOW: "bg-grey-20 text-charcoal" };
-  return <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${tone[priority] ?? ""}`}>{t.has(priority) ? t(priority) : priority}</span>;
+  const tone: Record<string, keyof typeof TONE> = { URGENT: "danger", HIGH: "warning", MEDIUM: "info", LOW: "neutral" };
+  return <span className={`badge ${TONE[tone[priority] ?? "neutral"]}`}>{t.has(priority) ? t(priority) : priority}</span>;
 }
 
 /** The SLA as words and a bar; never a raw timestamp. */
@@ -36,19 +41,24 @@ export function ClockBar({ dueAt, startedAt }: { dueAt: string; startedAt?: stri
   );
 }
 
-/** Big tappable cards instead of a dropdown. One help line each. */
-export function ChoiceCards({ options, value, onChange, columns = 2 }: { options: Lookup[]; value?: string; onChange: (code: string) => void; columns?: 1 | 2 | 3 }) {
+/** Big tappable cards instead of a dropdown. One help line each. With `icons` each card gets a round icon and a chevron (the one-question-per-screen look). */
+export function ChoiceCards({ options, value, onChange, columns = 2, icons }: { options: Lookup[]; value?: string; onChange: (code: string) => void; columns?: 1 | 2 | 3; icons?: Record<string, IconName> }) {
   const { label, help } = useLabel();
   const cols = { 1: "grid-cols-1", 2: "grid-cols-1 sm:grid-cols-2", 3: "grid-cols-1 sm:grid-cols-3" }[columns];
   return (
-    <div className={`grid gap-3 ${cols}`} role="radiogroup">
+    <div className={`grid gap-3.5 ${cols}`} role="radiogroup">
       {options.map((o) => {
         const on = o.code === value;
+        const icon = icons?.[o.code];
         return (
           <button type="button" key={o.code} role="radio" aria-checked={on} onClick={() => onChange(o.code)}
-            className={`text-left rounded-2xl border-2 p-4 min-h-14 transition-colors ${on ? "border-brand bg-brand/5" : "border-grey-20 bg-white hover:border-grey-60"}`}>
-            <div className="font-semibold">{label(o)}</div>
-            {help(o) && <div className="help mt-0.5">{help(o)}</div>}
+            className={`flex items-center gap-4 text-left rounded-[17px] border-[1.5px] px-4 transition-[border-color,background-color,box-shadow] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-brand/30 ${icon ? "min-h-[98px] py-4 sm:min-h-[112px] sm:px-5" : "min-h-14 py-3.5"} ${on ? "border-brand bg-brand-50 shadow-[0_0_0_3px_rgba(229,36,42,.08)]" : "border-grey-20 bg-white hover:border-brand-200"}`}>
+            {icon && <span className="grid size-11 sm:size-14 shrink-0 place-items-center rounded-full bg-brand-50 text-brand"><Icon name={icon} className="size-6 sm:size-7" /></span>}
+            <span className="min-w-0 flex-1">
+              <span className="block text-base sm:text-lg font-bold leading-snug">{label(o)}</span>
+              {help(o) && <span className="help mt-1 block">{help(o)}</span>}
+            </span>
+            {icon && <Icon name="chevron" className="size-5 shrink-0 text-muted" />}
           </button>
         );
       })}
@@ -73,7 +83,7 @@ export function Field({ label, error, help, children }: { label: string; error?:
 }
 
 export function PageTitle({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
-  return <div className="flex items-start justify-between gap-4 mb-5"><h1 className="text-2xl md:text-[28px] font-bold text-charcoal">{children}</h1>{right}</div>;
+  return <div className="mb-6 flex items-start justify-between gap-4"><h1 className="text-[clamp(30px,4vw,43px)] leading-[1.08] tracking-[-0.04em] font-extrabold text-ink">{children}</h1>{right}</div>;
 }
 
 export function EmptyState({ children }: { children: React.ReactNode }) {

@@ -2,7 +2,8 @@
   "app": {
     "name": "JEMCO NCR",
     "signOut": "Sign out",
-    "language": "Bahasa Malaysia"
+    "language": "Bahasa Malaysia",
+    "signedInAs": "Signed in as {name}"
   },
   "nav": {
     "todo": "Your to-do",
@@ -15,7 +16,16 @@
     "register": "Register",
     "admin": "Admin",
     "account": "Account",
-    "partners": "Suppliers & customers"
+    "partners": "Suppliers & customers",
+    "todoShort": "To-do",
+    "newShort": "Report",
+    "complaintsShort": "Reports",
+    "more": "More",
+    "main": "Main navigation",
+    "close": "Close menu",
+    "groupWork": "Work",
+    "groupInsights": "Insights",
+    "groupAdmin": "Administration"
   },
   "login": {
     "title": "Sign in",

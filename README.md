@@ -52,6 +52,10 @@ Every notification is queued twice: `IN_APP` (shown in the app) and `EMAIL`. A j
 
 On closure an effectiveness review is scheduled 90 working days out. A daily job (08:30) reminds QA 7 days before and once when overdue; reviews due within 7 days appear in QA's to-do. QA records Effective, Not effective or Not applicable on the NCR page; Not effective opens a follow-up NCR linked as a recurrence, assigned to the same PIC with fresh clocks. `POST /v1/admin/jobs/{effectiveness|sla|mail|digest}` runs any scheduled job on demand (QA manager).
 
+## Design system
+
+The look follows the "Light Glass" system in `docs/design/` (open the HTML file in a browser; the "Report a problem" screen next to it is the reference for the one-question-per-step form). Its tokens live in `apps/web/src/app/globals.css`: brand red `#E5242A` for primary actions and active states only, ink and line greys, the status colours, and the glass recipe. Dense forms and tables stay solid white; glass is for the sidebar, the phone tab bar, overlays and the sign-in card. Navigation is a grouped sidebar from 760px up, and below that a four-tab bar (To-do, Report, Reports, Triage for QA) with a More sheet for the remaining pages. Change a token once in `globals.css` and every screen follows.
+
 ## Sign-in
 
 Sign-in is by work email and password only; there is no Google or Microsoft single sign-on. The QA manager creates accounts in Admin → People, which issues a temporary password that must be changed on first sign-in. Roles are a property of the account, so the login screen never asks who you are or what you do. Ten failed attempts lock an account for 15 minutes.

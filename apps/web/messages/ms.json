@@ -2,7 +2,8 @@
   "app": {
     "name": "JEMCO NCR",
     "signOut": "Log keluar",
-    "language": "English"
+    "language": "English",
+    "signedInAs": "Log masuk sebagai {name}"
   },
   "nav": {
     "todo": "Tugasan anda",
@@ -15,7 +16,16 @@
     "register": "Daftar",
     "admin": "Pentadbir",
     "account": "Akaun",
-    "partners": "Pembekal & pelanggan"
+    "partners": "Pembekal & pelanggan",
+    "todoShort": "Tugasan",
+    "newShort": "Lapor",
+    "complaintsShort": "Laporan",
+    "more": "Lagi",
+    "main": "Navigasi utama",
+    "close": "Tutup menu",
+    "groupWork": "Kerja",
+    "groupInsights": "Analisis",
+    "groupAdmin": "Pentadbiran"
   },
   "login": {
     "title": "Log masuk",

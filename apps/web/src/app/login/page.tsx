@@ -24,12 +24,12 @@ function LoginForm() {
     } catch { setErr(t("failed")); } finally { setBusy(false); }
   }
   return (
-    <form onSubmit={submit} className="card w-full max-w-sm space-y-4">
+    <form onSubmit={submit} className="glass w-full max-w-sm space-y-4 rounded-3xl p-7">
       <Image src="/jemco-logo.webp" alt="JEMCO" width={160} height={50} className="mx-auto" priority />
-      <h1 className="text-xl font-bold text-center text-charcoal">{t("title")}</h1>
+      <h1 className="text-center text-2xl font-extrabold tracking-tight text-ink">{t("title")}</h1>
       <Field label={t("email")}><input className="input" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></Field>
       <Field label={t("password")} error={err}><input className="input" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></Field>
-      <button className="btn-primary w-full" disabled={busy}>{t("button")}</button>
+      <button className="btn-primary btn-lg w-full" disabled={busy}>{t("button")}</button>
     </form>
   );
 }

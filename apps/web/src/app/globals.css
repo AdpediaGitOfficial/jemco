@@ -1,31 +1,70 @@
 @import "tailwindcss";
 
-/* JEMCO brand tokens, measured from the logo. Status red is deliberately a different red. */
+/*
+ * JEMCO "Light Glass" design system (docs/design/jemco-light-glass-design-system.html).
+ * Brand red is for primary actions and active states only. Dense forms and tables stay solid white;
+ * glass (translucent white + blur) is for navigation, overlays and low-density panels.
+ * Legacy class names (brand, ink, charcoal, grey-60, grey-20, surface, ok, warn, bad) map onto the system tokens.
+ */
 @theme {
-  --color-brand: #cd1918;
-  --color-brand-dark: #a01010;
-  --color-charcoal: #474749;
-  --color-ink: #1f1f23;
-  --color-grey-60: #6b6b70;
-  --color-grey-20: #e6e6e9;
-  --color-surface: #f7f7f8;
-  --color-ok: #1e8e3e;
-  --color-warn: #c77700;
-  --color-bad: #b3261e;
-  --color-muted: #8a8a8f;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --color-brand-50: #fff1f1;
+  --color-brand-100: #ffe0e0;
+  --color-brand-200: #ffc4c5;
+  --color-brand: #e5242a;          /* brand-500 */
+  --color-brand-dark: #ce1b21;     /* brand-600 */
+  --color-brand-700: #ae171c;
+  --color-ink: #202127;            /* ink-900 */
+  --color-charcoal: #484b54;       /* ink-700 */
+  --color-grey-60: #737783;        /* ink-500 */
+  --color-muted: #9397a1;          /* ink-400 */
+  --color-grey-20: #e3e5e9;        /* line */
+  --color-line-strong: #d7dae0;
+  --color-surface: #f7f8fa;        /* canvas */
+  --color-ok: #218653;   --color-ok-bg: #eaf8f0;
+  --color-warn: #9b650b; --color-warn-bg: #fff6df;
+  --color-bad: #c62828;  --color-bad-bg: #fff0f0;
+  --color-info: #315fba; --color-info-bg: #edf3ff;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  --breakpoint-nav: 760px;         /* sidebar above this width, bottom tab bar below */
 }
 
-html { font-size: 16px; }
-body { background: var(--color-surface); color: var(--color-ink); font-family: var(--font-sans); }
+/* Utilities (so @apply can compose them). */
+@utility glass { background: rgba(255, 255, 255, .72); border: 1px solid rgba(255, 255, 255, .92); box-shadow: 0 8px 32px rgba(33, 39, 56, .07); -webkit-backdrop-filter: blur(18px) saturate(135%); backdrop-filter: blur(18px) saturate(135%); }
+@utility btn { @apply inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-xl border border-transparent text-[13px] font-bold transition active:translate-y-px disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand/30; }
 
-/* 48px tap targets everywhere a layman taps. */
-@utility btn { @apply inline-flex items-center justify-center min-h-12 px-5 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed; }
-.btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark; }
-.btn-secondary { @apply btn bg-white text-ink border border-grey-20 hover:bg-surface; }
-.btn-ghost { @apply btn text-grey-60 hover:text-ink; }
-.card { @apply bg-white rounded-2xl border border-grey-20 p-5; }
-.input { @apply w-full min-h-12 rounded-xl border border-grey-20 bg-white px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand/40; }
-.label { @apply block text-sm font-semibold text-charcoal mb-1.5; }
-.help { @apply text-sm text-grey-60; }
-.error { @apply text-sm text-bad mt-1; }
+@layer base {
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body { background: var(--color-surface); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  /* Soft colour orbs behind everything: decoration only, never behind dense content. */
+  body::before, body::after { content: ""; position: fixed; z-index: -1; pointer-events: none; border-radius: 50%; opacity: .55; }
+  body::before { width: 340px; height: 340px; right: -100px; top: 80px; background: radial-gradient(circle, #ffe2e2 0%, rgba(255, 226, 226, 0) 72%); }
+  body::after { width: 420px; height: 420px; left: -180px; top: 620px; background: radial-gradient(circle, #e6eaff 0%, rgba(230, 234, 255, 0) 72%); }
+  table { font-size: 13px; }
+  th { font-size: 10px; text-transform: uppercase; letter-spacing: .7px; font-weight: 800; color: var(--color-grey-60); }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+}
+
+@layer components {
+  /* Surfaces */
+  .panel { @apply glass rounded-3xl p-[17px] sm:p-[22px] min-w-0; }
+  .card { @apply bg-white rounded-[18px] border border-grey-20 p-5 shadow-[0_2px_8px_rgba(27,31,45,.04)]; }
+
+  /* Buttons: 44px tap target; one strong primary per view. */
+  .btn-primary { @apply btn bg-brand text-white shadow-[0_5px_12px_rgba(229,36,42,.16)] hover:bg-brand-dark; }
+  .btn-secondary { @apply btn bg-white/80 border-grey-20 text-charcoal hover:bg-white; }
+  .btn-glass { @apply btn bg-white/55 border-white/95 text-charcoal shadow-[0_2px_8px_rgba(27,31,45,.04)] backdrop-blur-md; }
+  .btn-ghost { @apply btn text-grey-60 hover:text-ink; }
+  .btn-danger { @apply btn bg-bad-bg text-bad border-[#ffdada]; }
+  .btn-lg { @apply min-h-[50px] px-5 rounded-[14px] text-sm; }
+  .btn-sm { @apply min-h-9 px-3 rounded-[9px] text-[11px]; }
+
+  /* Forms: 16px text on phones (stops iOS zooming into the field), 13px from tablet up. */
+  .input { @apply w-full min-h-11 rounded-[11px] border border-line-strong bg-white px-3 py-2.5 text-base nav:text-[13px] text-ink outline-none placeholder:text-[#a3a6ae] focus:border-brand focus:ring-[3px] focus:ring-brand/10; }
+  .label { @apply block text-xs font-bold text-charcoal mb-1.5; }
+  .help { @apply text-[13px] leading-relaxed text-grey-60; }
+  .error { @apply text-xs text-bad mt-1; }
+
+  /* Badge: colour plus words, always. */
+  .badge { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold whitespace-nowrap; }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+}

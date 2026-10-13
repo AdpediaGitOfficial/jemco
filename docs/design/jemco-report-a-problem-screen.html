@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f8f8fa" />
+<title>Jemco — Report a Problem</title>
+<style>
+  :root {
+    --red: #e51e24;
+    --red-dark: #c9171d;
+    --ink: #202127;
+    --muted: #6f7179;
+    --line: #e4e5e9;
+    --surface: #ffffff;
+    --page: #f7f7f9;
+    --nav-height: 76px;
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; }
+  html { min-height: 100%; background: var(--page); }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--page);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; }
+  .app { min-height: 100dvh; display: flex; flex-direction: column; }
+  .site-header {
+    height: 76px;
+    padding: 0 clamp(18px, 4.2vw, 38px);
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; border-bottom: 1px solid var(--line);
+    position: relative; z-index: 2;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; color: var(--red); font-weight: 900; font-style: italic; font-size: clamp(26px, 5vw, 36px); letter-spacing: -1.8px; }
+  .brand-mark {
+    width: 34px; height: 34px; border: 5px solid #303238; border-right-color: transparent;
+    border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+    transform: rotate(-25deg); position: relative; flex: 0 0 auto;
+  }
+  .brand-mark::before { content:""; width: 11px; height: 11px; background: var(--red); border-radius: 50%; }
+  .brand-mark::after { content:""; position:absolute; width:8px; height:15px; background:var(--red); right:-5px; top:-5px; transform:rotate(25deg); }
+  .account { display: flex; align-items: center; gap: clamp(12px, 4vw, 30px); color: var(--muted); font-weight: 600; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #f4f5f7; display:grid; place-items:center; color:#5c5f68; }
+  .signout { border: 0; background: transparent; color: inherit; padding: 10px 0; cursor: pointer; }
+  main {
+    width: min(100%, 900px); margin: 0 auto; padding: 28px clamp(16px, 4.2vw, 38px) calc(var(--nav-height) + 28px);
+    flex: 1;
+  }
+  .heading-row { display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin: 0 0 20px; }
+  h1 { margin:0; font-size: clamp(25px, 4.8vw, 36px); line-height:1.18; letter-spacing:-.8px; font-weight:750; }
+  .step { color:var(--muted); font-size:15px; white-space:nowrap; }
+  .progress { height:7px; width:100%; background:#e6e7eb; border-radius:99px; overflow:hidden; margin-bottom:28px; }
+  .progress-fill { width:14.285%; height:100%; border-radius:inherit; background:var(--red); }
+  .form-card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:clamp(20px, 4.2vw, 34px); box-shadow:0 6px 20px rgba(25,30,45,.035); }
+  h2 { margin:0 0 22px; font-size:clamp(21px, 4.1vw, 29px); line-height:1.3; letter-spacing:-.45px; }
+  .options { display:grid; gap:14px; }
+  .option {
+    display:flex; align-items:center; gap:16px; width:100%; min-height:112px; padding:17px 18px;
+    border:1.5px solid var(--line); border-radius:17px; background:#fff; text-align:left; cursor:pointer;
+    transition:border-color .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .option:hover { border-color:#ef9a9d; }
+  .option[aria-pressed="true"] { border-color:var(--red); background:#fffafa; box-shadow:0 0 0 3px rgba(229,30,36,.07); }
+  .option-icon { flex:0 0 56px; width:56px; height:56px; border-radius:50%; background:#fff0f0; color:var(--red); display:grid; place-items:center; }
+  .option-icon svg { width:29px; height:29px; stroke:currentColor; }
+  .option-copy { flex:1; min-width:0; }
+  .option-title { display:block; font-size:clamp(16px, 3.5vw, 20px); font-weight:700; line-height:1.3; margin-bottom:6px; }
+  .option-desc { display:block; color:var(--muted); font-size:clamp(13px, 2.9vw, 16px); line-height:1.45; }
+  .chevron { color:#9296a0; flex:0 0 auto; width:21px; height:21px; }
+  .actions { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:28px; }
+  .btn { min-width:108px; min-height:54px; border-radius:14px; padding:13px 24px; border:1px solid var(--line); background:#fff; color:#5f626b; font-weight:650; cursor:pointer; }
+  .btn-primary { background:var(--red); border-color:var(--red); color:#fff; box-shadow:0 4px 10px rgba(229,30,36,.12); }
+  .btn-primary:hover { background:var(--red-dark); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .bottom-nav {
+    position:fixed; z-index:10; bottom:0; left:0; right:0;
+    min-height:var(--nav-height); padding:8px max(12px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px;
+    background:rgba(255,255,255,.97); border-top:1px solid #e1e2e6;
+    box-shadow:0 -5px 18px rgba(25,30,45,.045); backdrop-filter:blur(14px);
+  }
+  .nav-item {
+    min-width:0; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px;
+    border:0; border-radius:12px; background:transparent; color:#777b85; padding:5px 2px;
+    cursor:pointer; font-size:12px; font-weight:550; line-height:1.15;
+  }
+  .nav-item svg { width:23px; height:23px; stroke:currentColor; }
+  .nav-item.active { color:var(--red); }
+  .nav-item:focus-visible, .option:focus-visible, .btn:focus-visible { outline:3px solid rgba(229,30,36,.25); outline-offset:2px; }
+  .toast { position:fixed; z-index:20; left:50%; bottom:calc(var(--nav-height) + 18px + env(safe-area-inset-bottom)); transform:translate(-50%, 12px); background:#25272d; color:#fff; border-radius:12px; padding:12px 16px; font-size:14px; box-shadow:0 8px 24px #0002; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; width:max-content; max-width:calc(100% - 32px); text-align:center; }
+  .toast.show { opacity:1; transform:translate(-50%,0); }
+  @media (min-width: 700px) {
+    main { padding-top:40px; }
+    .form-card { padding:34px; }
+    .option { min-height:116px; }
+    .bottom-nav { position:sticky; bottom:0; padding-bottom:8px; }
+  }
+  @media (max-width: 380px) {
+    .site-header { height:66px; }
+    .brand { font-size:25px; }
+    .brand-mark { width:29px; height:29px; }
+    .avatar { width:34px; height:34px; }
+    .account { gap:10px; }
+    main { padding-top:22px; padding-left:13px; padding-right:13px; }
+    .form-card { padding:18px 14px; }
+    .option { gap:11px; padding:14px 12px; min-height:98px; border-radius:14px; }
+    .option-icon { width:44px; height:44px; flex-basis:44px; }
+    .option-icon svg { width:24px; height:24px; }
+    .actions { margin-top:22px; }
+    .btn { min-width:88px; min-height:48px; padding:11px 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) { *,*::before,*::after { transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="site-header">
+    <div class="brand" aria-label="Jemco">
+      <span class="brand-mark" aria-hidden="true"></span><span>Jemco</span>
+    </div>
+    <div class="account">
+      <span class="avatar" aria-label="Signed in as BM">BM</span>
+      <button class="signout" type="button" id="signout">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="heading-row">
+      <h1>Report a problem</h1>
+      <span class="step">Step 1 of 7</span>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Form progress" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1">
+      <div class="progress-fill"></div>
+    </div>
+
+    <section class="form-card" aria-labelledby="question">
+      <h2 id="question">What kind of problem is it?</h2>
+      <div class="options" role="group" aria-label="Problem type">
+        <button class="option" type="button" aria-pressed="false" data-type="Corrective action">
+          <span class="option-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18a2.1 2.1 0 0 0 3 3l5.3-5.3a5 5 0 0 0 6.4-6.4l-3.1 3.1-3.1-3.1 3.2-3z"/></svg>
+          </span>
+          <span class="option-copy"><span class="option-title">Corrective action</span><span class="option-desc">Something has already gone wrong</span></span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <button class="option" type="button" aria-pressed="false" data-type="Preventive action">
+          <span class="option-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m10.3 3.9-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          </span>
+          <span class="option-copy"><span class="option-title">Preventive action</span><span class="option-desc">Something could go wrong if not fixed</span></span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <button class="option" type="button" aria-pressed="false" data-type="Suggestion for improvement">
+          <span class="option-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.5 14.5A7 7 0 1 1 15.5 14.5c-.9.7-1.5 1.5-1.5 2.5h-4c0-1-.6-1.8-1.5-2.5Z"/><path d="M12 1v2M4.2 4.2l1.4 1.4M1 12h2M21 12h2M18.4 5.6l1.4-1.4"/></svg>
+          </span>
+          <span class="option-copy"><span class="option-title">Suggestion for improvement</span><span class="option-desc">An idea to make things better</span></span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" id="back">Back</button>
+        <button class="btn btn-primary" type="button" id="next" disabled>Next</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-item" type="button" data-nav="To-do">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="12" height="16" rx="2"/><path d="M9 5V3h6v2M9 10h6M9 14h6"/></svg><span>To-do</span>
+    </button>
+    <button class="nav-item active" type="button" data-nav="Report" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m10 14 9-9 3 3-9 9-4 1z"/></svg><span>Report</span>
+    </button>
+    <button class="nav-item" type="button" data-nav="Reports">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span>Reports</span>
+    </button>
+    <button class="nav-item" type="button" data-nav="Triage">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1a6 6 0 0 1 12 0v1zM15 15a5 5 0 0 1 6 5"/></svg><span>Triage</span>
+    </button>
+  </nav>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+  const options = [...document.querySelectorAll('.option')];
+  const next = document.getElementById('next');
+  const toast = document.getElementById('toast');
+  let selected = null;
+  let toastTimer;
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+  }
+  options.forEach(option => option.addEventListener('click', () => {
+    selected = option.dataset.type;
+    options.forEach(item => item.setAttribute('aria-pressed', String(item === option)));
+    next.disabled = false;
+  }));
+  next.addEventListener('click', () => {
+    if (!selected) return;
+    showToast(`${selected} selected — next step is ready to connect.`);
+  });
+  document.getElementById('back').addEventListener('click', () => showToast('You are on the first step.'));
+  document.getElementById('signout').addEventListener('click', () => showToast('Connect this button to your sign-out flow.'));
+  document.querySelectorAll('.nav-item').forEach(item => item.addEventListener('click', () => {
+    const label = item.dataset.nav;
+    if (label === 'Report') return;
+    document.querySelectorAll('.nav-item').forEach(nav => {
+      nav.classList.remove('active');
+      nav.removeAttribute('aria-current');
+    });
+    item.classList.add('active');
+    item.setAttribute('aria-current', 'page');
+    showToast(`${label} navigation selected. Connect this tab to its page.`);
+  }));
+</script>
+</body>
+</html>
