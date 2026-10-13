@@ -7,7 +7,7 @@ WORKDIR /app
 
 FROM base AS build
 ARG NEXT_PUBLIC_API_URL=/api/v1
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL NEXT_TELEMETRY_DISABLED=1 NEXT_OUTPUT=standalone
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
 COPY packages/shared/package.json packages/shared/
 COPY apps/web/package.json apps/web/
